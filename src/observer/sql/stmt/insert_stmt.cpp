@@ -16,6 +16,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/log/log.h"
 #include "storage/db/db.h"
 #include "storage/table/table.h"
+#include <iostream>
 
 InsertStmt::InsertStmt(Table *table, const Value *values, int value_amount)
     : table_(table), values_(values), value_amount_(value_amount)

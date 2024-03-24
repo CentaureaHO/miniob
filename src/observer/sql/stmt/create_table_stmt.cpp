@@ -14,6 +14,7 @@ See the Mulan PSL v2 for more details. */
 
 #include "sql/stmt/create_table_stmt.h"
 #include "event/sql_debug.h"
+#include <iostream>
 
 RC CreateTableStmt::create(Db *db, const CreateTableSqlNode &create_table, Stmt *&stmt)
 {

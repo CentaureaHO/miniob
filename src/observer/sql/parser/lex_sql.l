@@ -79,6 +79,7 @@ QUOTE            [\'\"]
 
 [\-]?{DIGIT}+                           yylval->number=atoi(yytext); RETURN_TOKEN(NUMBER);
 [\-]?{DIGIT}+{DOT}{DIGIT}+              yylval->floats=(float)(atof(yytext)); RETURN_TOKEN(FLOAT);
+{QUOTE}[0-9]+-[0-9]+-[0-9]+{QUOTE}       yylval->string=strdup(yytext); RETURN_TOKEN(DATE_STR);
 
 ";"                                     RETURN_TOKEN(SEMICOLON);
 {DOT}                                   RETURN_TOKEN(DOT);
@@ -107,9 +108,14 @@ SET                                     RETURN_TOKEN(SET);
 BEGIN                                   RETURN_TOKEN(TRX_BEGIN);
 COMMIT                                  RETURN_TOKEN(TRX_COMMIT);
 ROLLBACK                                RETURN_TOKEN(TRX_ROLLBACK);
+
+
 INT                                     RETURN_TOKEN(INT_T);
 CHAR                                    RETURN_TOKEN(STRING_T);
 FLOAT                                   RETURN_TOKEN(FLOAT_T);
+DATE                                    RETURN_TOKEN(DATE_T);
+
+
 LOAD                                    RETURN_TOKEN(LOAD);
 DATA                                    RETURN_TOKEN(DATA);
 INFILE                                  RETURN_TOKEN(INFILE);
