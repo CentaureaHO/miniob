@@ -58,10 +58,11 @@ Value::Value(const char *s, int len /*= 0*/)
   set_string(s, len);
 }
 
-Value::Value(const char* date, int len, int flag)
+// For type date
+Value::Value(const char* StrDate, int len, int flag)
 {
   int IntDate = 0;
-  StrDate2IntDate(date, IntDate);
+  StrDate2IntDate(StrDate, IntDate);
   set_date(IntDate);
 }
 
