@@ -11,9 +11,33 @@ void StrDate2IntDate(const char *StrDate, int &IntDate)
 {
     int Year, Month, Day;
     sscanf(StrDate, "%d-%d-%d", &Year, &Month, &Day);
-    int MonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int mon[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (Year < 1970 || Year > 2038 || Month < 1 || Month > 12 || Day < 1) 
+    {
+        Year = 9999;
+    } 
+    else 
+    {
+        if (Year == 2038 && (Month > 2 || (Month == 2 && Day > 28))) 
+        {
+            Year = 9999;
+        } 
+        else 
+        {
+            bool leap = IsLeapYear(Year);
+            mon[2] = leap ? 29 : 28;
+            if (Day > mon[Month]) 
+            {
+                Year = 9999;
+            }
+        }
+    }
+    if (Year == 9999) {
+        IntDate = -1;
+        return;
+    }
     IntDate = (Year - 1970) * 365 + (Year - 1969) / 4 - (Year - 1901) / 100 + (Year - 1601) / 400;
-    for (int i = 0; i < Month - 1; ++i) IntDate += MonthDays[i];
+    for (int i = 0; i < Month - 1; ++i) IntDate += mon[i];
     if (Month > 2 && IsLeapYear(Year)) ++IntDate;
     IntDate += Day - 1;
 }
@@ -80,4 +104,9 @@ std::string IntDate2StrDate2(int IntDate)
         << std::setw(2) << Month << "-"
         << std::setw(2) << Day;
     return oss.str();
+}
+
+bool CheckDate(int IntDate) 
+{
+    return IntDate >= 0;
 }

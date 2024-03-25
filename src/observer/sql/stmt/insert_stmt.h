@@ -16,6 +16,7 @@ See the Mulan PSL v2 for more details. */
 
 #include "common/rc.h"
 #include "sql/stmt/stmt.h"
+#include "sql/parser/DateProcessor.h"
 
 class Table;
 class Db;

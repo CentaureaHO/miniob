@@ -125,7 +125,22 @@ RC FilterStmt::create_filter_unit(Db *db, Table *default_table, std::unordered_m
   }
 
   filter_unit->set_comp(comp);
-
+  if(condition.left_value.attr_type()==DATES)
+  {
+    if (!CheckDate(condition.left_value.get_date())) 
+    {
+      LOG_WARN("invalid date value");
+      return RC::INVALID_ARGUMENT;
+    }
+  }
+  if(condition.right_value.attr_type()==DATES)
+  {
+    if (!CheckDate(condition.right_value.get_date())) 
+    {
+      LOG_WARN("invalid date value");
+      return RC::INVALID_ARGUMENT;
+    }
+  }
   // 检查两个类型是否能够比较
   return rc;
 }
