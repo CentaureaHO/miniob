@@ -18,6 +18,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/lang/string.h"
 #include "storage/db/db.h"
 #include "storage/table/table.h"
+#include <iostream>
 
 SelectStmt::~SelectStmt()
 {
@@ -131,6 +132,7 @@ RC SelectStmt::create(Db *db, const SelectSqlNode &select_sql, Stmt *&stmt)
   }
 
   // create filter statement in `where` statement
+
   FilterStmt *filter_stmt = nullptr;
   RC rc = FilterStmt::create(db,
       default_table,
