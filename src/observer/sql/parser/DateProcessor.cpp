@@ -7,37 +7,29 @@ bool IsLeapYear(int Year)
     return 0;
 }
 
+bool IsDateValid(int y, int m, int d) 
+{
+    if (y < 1970 || y > 2038) return false;
+    if (y == 2038 && (m > 2 || (m == 2 && d > 28))) return false;
+
+    int mon[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (IsLeapYear(y)) mon[2] = 29;
+
+    return m > 0 && m <= 12 && d > 0 && d <= mon[m];
+}
+
 void StrDate2IntDate(const char *StrDate, int &IntDate) 
 {
     int Year, Month, Day;
     sscanf(StrDate, "%d-%d-%d", &Year, &Month, &Day);
-    int mon[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (Year < 1970 || Year > 2038 || Month < 1 || Month > 12 || Day < 1) 
+    if (!IsDateValid(Year, Month, Day)) 
     {
-        Year = 9999;
-    } 
-    else 
-    {
-        if (Year == 2038 && (Month > 2 || (Month == 2 && Day > 28))) 
-        {
-            Year = 9999;
-        } 
-        else 
-        {
-            bool leap = IsLeapYear(Year);
-            mon[2] = leap ? 29 : 28;
-            if (Day > mon[Month]) 
-            {
-                Year = 9999;
-            }
-        }
-    }
-    if (Year == 9999) {
         IntDate = -1;
         return;
     }
+    int MonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     IntDate = (Year - 1970) * 365 + (Year - 1969) / 4 - (Year - 1901) / 100 + (Year - 1601) / 400;
-    for (int i = 0; i < Month - 1; ++i) IntDate += mon[i];
+    for (int i = 0; i < Month - 1; ++i) IntDate += MonthDays[i];
     if (Month > 2 && IsLeapYear(Year)) ++IntDate;
     IntDate += Day - 1;
 }
