@@ -17,6 +17,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/log/log.h"
 #include "common/lang/string.h"
 #include "event/session_event.h"
+#include <iostream>
 
 #ifdef USE_READLINE
 #include "readline/readline.h"
@@ -129,6 +130,7 @@ RC CliCommunicator::read_event(SessionEvent *&event)
   char *command = read_command();
 
   if (is_exit_command(command)) {
+    std::cout << "Bye." << std::endl;
     free(command);
     event = nullptr;
     return RC::SUCCESS;
