@@ -107,7 +107,6 @@ private:
     int int_value_;
     float float_value_;
     bool bool_value_;
-    int date_value_;
   } num_value_;
   std::string str_value_;
 };

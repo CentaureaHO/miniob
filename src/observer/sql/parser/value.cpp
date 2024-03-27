@@ -85,7 +85,7 @@ void Value::set_data(char *data, int length)
       length_ = length;
     } break;
     case DATES: {
-      num_value_.date_value_ = *(int *)data;
+      num_value_.int_value_ = *(int *)data;
       length_ = length;
     } break;
     default: {
@@ -127,7 +127,7 @@ void Value::set_string(const char *s, int len /*= 0*/)
 void Value::set_date(int val)
 {
   attr_type_ = DATES;
-  num_value_.date_value_= val;
+  num_value_.int_value_= val;
   length_ = sizeof(val);
 }
 void Value::set_value(const Value &value)
@@ -183,7 +183,7 @@ std::string Value::to_string() const
       os << str_value_;
     } break;
     case DATES: {
-      os << IntDate2StrDate2(num_value_.date_value_);
+      os << IntDate2StrDate2(num_value_.int_value_);
     } break;
     default: {
       LOG_WARN("unsupported attr type: %d", attr_type_);
@@ -212,7 +212,7 @@ int Value::compare(const Value &other) const
         return common::compare_int((void *)&this->num_value_.bool_value_, (void *)&other.num_value_.bool_value_);
       }
       case DATES: {
-        return common::compare_date((void *)&this->num_value_.date_value_, (void *)&other.num_value_.date_value_);
+        return common::compare_date((void *)&this->num_value_.int_value_, (void *)&other.num_value_.int_value_);
       }
       default: {
         LOG_WARN("unsupported type: %d", this->attr_type_);
@@ -250,7 +250,7 @@ int Value::get_int() const
       return (int)(num_value_.bool_value_);
     }
     case DATES: {
-      return num_value_.date_value_;
+      return num_value_.int_value_;
     }
     default: {
       LOG_WARN("unknown data type. type=%d", attr_type_);
@@ -281,7 +281,7 @@ float Value::get_float() const
       return float(num_value_.bool_value_);
     } break;
     case DATES: {
-      return num_value_.date_value_;
+      return num_value_.int_value_;
     }
     default: {
       LOG_WARN("unknown data type. type=%d", attr_type_);
@@ -328,7 +328,7 @@ bool Value::get_boolean() const
       return num_value_.bool_value_;
     } break;
     case DATES: {
-      return num_value_.date_value_ != 0;
+      return num_value_.int_value_ != 0;
     }
     default: {
       LOG_WARN("unknown data type. type=%d", attr_type_);
@@ -359,7 +359,7 @@ int Value::get_date() const
       return (int)(num_value_.bool_value_);
     }
     case DATES: {
-      return num_value_.date_value_;
+      return num_value_.int_value_;
     }
     default: {
       LOG_WARN("unknown data type. type=%d", attr_type_);
