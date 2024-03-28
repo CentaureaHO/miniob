@@ -257,6 +257,15 @@ struct ErrorSqlNode
  * @brief 表示一个SQL语句的类型
  * @ingroup SQLParser
  */
+/*
+  stmt.cpp内未出现的枚举值：
+  SCF_ERROR,
+  SCF_UPDATE,
+  SCF_DROP_TABLE,
+  SCF_DROP_INDEX,
+  SCF_SYNC,
+  SCF_CLOG_SYNC
+*/
 enum SqlCommandFlag
 {
   SCF_ERROR = 0,
