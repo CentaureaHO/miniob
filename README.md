@@ -8,6 +8,7 @@
 2024.03.27: 1. 修改date类型，删除date_value_，共用int_value_；
 
 2024.03.28: 1. 开始实现DROP TABLE；
+            2. 完成DROP TABLE实现；
 
 # MiniOB 概述
 

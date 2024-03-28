@@ -261,7 +261,6 @@ struct ErrorSqlNode
   stmt.cpp内未出现的枚举值：
   SCF_ERROR,
   SCF_UPDATE,
-  SCF_DROP_TABLE,
   SCF_DROP_INDEX,
   SCF_SYNC,
   SCF_CLOG_SYNC
