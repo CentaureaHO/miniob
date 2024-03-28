@@ -132,7 +132,7 @@ RC Table::drop(const char* dir)
 
     if (rc != RC::SUCCESS) return rc;
 
-    // 删除表数据文件
+    // 删除数据文件
     std::string data_file = std::string(dir) + "/" + name() + ".data";
     if (unlink(data_file.c_str()) != 0) 
     {
@@ -140,7 +140,7 @@ RC Table::drop(const char* dir)
         return RC::UNIMPLENMENT;
     }
 
-    // 删除表元数据文件
+    // 删除元数据文件
     std::string table_file = std::string(dir) + "/" + name() + ".table";
     if (unlink(table_file.c_str()) != 0) 
     {
@@ -148,7 +148,7 @@ RC Table::drop(const char* dir)
         return RC::UNIMPLENMENT;
     }
 
-    // 删除所有索引文件
+    // 删除索引文件
     const int index_num = table_meta_.index_num();
     for (int i = 0; i < index_num; i++) 
     {

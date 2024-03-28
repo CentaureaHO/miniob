@@ -4,7 +4,8 @@
 
 class SQLStageEvent;
 
-class DropTableExecutor {
+class DropTableExecutor 
+{
 public:
   DropTableExecutor() = default;
   virtual ~DropTableExecutor() = default;
