@@ -1,4 +1,6 @@
 #include "DateProcessor.h"
+#include <iostream>
+#define MinInt 0x80000000
 
 bool IsLeapYear(int Year)
 {
@@ -9,9 +11,7 @@ bool IsLeapYear(int Year)
 
 bool IsDateValid(int y, int m, int d) 
 {
-    if (y < 1970 || y > 2038) return false;
-    if (y == 2038 && (m > 2 || (m == 2 && d > 28))) return false;
-
+    if (y > 5000000) return 0;
     int mon[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
     if (IsLeapYear(y)) mon[2] = 29;
 
@@ -24,81 +24,61 @@ void StrDate2IntDate(const char *StrDate, int &IntDate)
     sscanf(StrDate, "%d-%d-%d", &Year, &Month, &Day);
     if (!IsDateValid(Year, Month, Day)) 
     {
-        IntDate = -1;
+        IntDate = MinInt;
         return;
     }
-    int MonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    IntDate = (Year - 1970) * 365 + (Year - 1969) / 4 - (Year - 1901) / 100 + (Year - 1601) / 400;
-    for (int i = 0; i < Month - 1; ++i) IntDate += MonthDays[i];
-    if (Month > 2 && IsLeapYear(Year)) ++IntDate;
-    IntDate += Day - 1;
+
+    bool isBefore1970 = Year < 1970;
+    int totalDays = 0;
+    if (isBefore1970) for (int y = 1969; y > Year; --y) totalDays -= (IsLeapYear(y) ? 366 : 365);
+    else for (int y = 1970; y < Year; ++y) totalDays += (IsLeapYear(y) ? 366 : 365);
+
+    int MonthDays[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    if (IsLeapYear(Year)) MonthDays[2] = 29;
+
+    for (int i = 0; i < Month - 1; ++i) totalDays += MonthDays[i + 1];
+    totalDays += Day - 1;
+
+    if (isBefore1970) totalDays = totalDays - 365 - (IsLeapYear(Year) ? 1 : 0);
+
+    IntDate = totalDays;
 }
 
-void IntDate2StrDate(int IntDate, char *StrDate) 
+std::string IntDate2StrDate(int IntDate) 
 {
     int Year = 1970;
-    while (IntDate >= 365) 
+    while (IntDate < 0 || IntDate >= (IsLeapYear(Year) ? 366 : 365)) 
     {
-        if (IsLeapYear(Year)) 
+        if (IntDate < 0) 
         {
-            if (IntDate >= 366) 
-            {
-                IntDate -= 366;
-                Year++;
-            }
+            Year--;
+            IntDate += IsLeapYear(Year) ? 366 : 365;
         } 
         else 
         {
-            IntDate -= 365;
+            IntDate -= IsLeapYear(Year) ? 366 : 365;
             Year++;
         }
     }
-    int MonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (IsLeapYear(Year)) MonthDays[1] = 29;
-    int Month = 1;
-    while (IntDate >= MonthDays[Month - 1] && Month <= 12) 
-    {
-        IntDate -= MonthDays[Month - 1];
-        Month++;
-    }
-    int Day = IntDate + 1;
-    std::ostringstream oss;
-    oss << std::setfill('0') << std::setw(4) << Year << "-" << std::setw(2) << Month << "-" << std::setw(2) << Day;
-    strncpy(StrDate, oss.str().c_str(), oss.str().length() + 1);
-}
 
-std::string IntDate2StrDate2(int IntDate)
-{
-    int Year = 1970;
-    while (IntDate >= 365) {
-        if (IsLeapYear(Year)) {
-            if (IntDate > 365) {
-                IntDate -= 366;
-                Year++;
-            }
-        } else {
-            IntDate -= 365;
-            Year++;
-        }
-    }
-    int MonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-    if (IsLeapYear(Year)) MonthDays[1] = 29;
-    
-    int Month = 1;
-    while (IntDate >= MonthDays[Month - 1]) {
-        IntDate -= MonthDays[Month - 1];
+    int daysInMonth[] = {31, IsLeapYear(Year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    int Month = 0;
+    while (IntDate >= daysInMonth[Month]) 
+    {
+        IntDate -= daysInMonth[Month];
         Month++;
     }
     int Day = IntDate + 1;
-    
+    Month += 1;
     std::ostringstream oss;
-    oss << std::setfill('0') << std::setw(4) << Year << "-"
-        << std::setw(2) << Month << "-"
-        << std::setw(2) << Day;
+    oss << std::setw(4) << std::setfill('0') << Year << "-"
+        << std::setw(2) << std::setfill('0') << Month << "-"
+        << std::setw(2) << std::setfill('0') << Day;
+
     return oss.str();
 }
 
 bool CheckDate(int IntDate) 
 {
-    return IntDate >= 0;
+    return IntDate != MinInt;
 }
