@@ -12,6 +12,7 @@
 #include "sql/parser/yacc_sql.hpp"
 #include "sql/parser/lex_sql.h"
 #include "sql/expr/expression.h"
+#include "sql/parser/DateProcessor.h"
 
 using namespace std;
 

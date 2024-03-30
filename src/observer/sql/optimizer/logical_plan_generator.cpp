@@ -24,6 +24,7 @@ See the Mulan PSL v2 for more details. */
 #include "sql/operator/join_logical_operator.h"
 #include "sql/operator/project_logical_operator.h"
 #include "sql/operator/explain_logical_operator.h"
+#include "sql/operator/update_logical_operator.h"
 
 #include "sql/stmt/stmt.h"
 #include "sql/stmt/calc_stmt.h"
@@ -32,14 +33,17 @@ See the Mulan PSL v2 for more details. */
 #include "sql/stmt/insert_stmt.h"
 #include "sql/stmt/delete_stmt.h"
 #include "sql/stmt/explain_stmt.h"
+#include "sql/stmt/update_stmt.h"
 
 using namespace std;
 
 RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalOperator> &logical_operator)
 {
   RC rc = RC::SUCCESS;
-  switch (stmt->type()) {
-    case StmtType::CALC: {
+  switch (stmt->type()) 
+  {
+    case StmtType::CALC: 
+    {
       CalcStmt *calc_stmt = static_cast<CalcStmt *>(stmt);
       rc = create_plan(calc_stmt, logical_operator);
     } break;
@@ -62,6 +66,11 @@ RC LogicalPlanGenerator::create(Stmt *stmt, unique_ptr<LogicalOperator> &logical
     case StmtType::EXPLAIN: {
       ExplainStmt *explain_stmt = static_cast<ExplainStmt *>(stmt);
       rc = create_plan(explain_stmt, logical_operator);
+    } break;
+
+    case StmtType::UPDATE: {
+      UpdateStmt* update_stmt = static_cast<UpdateStmt*>(stmt);
+      rc = create_plan(update_stmt, logical_operator);
     } break;
     default: {
       rc = RC::UNIMPLENMENT;
@@ -212,4 +221,37 @@ RC LogicalPlanGenerator::create_plan(
   logical_operator = unique_ptr<LogicalOperator>(new ExplainLogicalOperator);
   logical_operator->add_child(std::move(child_oper));
   return rc;
+}
+
+RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<LogicalOperator>& logical_operator) 
+{
+  Table* table = update_stmt->table();
+  const TableMeta& table_meta = table->table_meta();
+  std::vector<Field> fields;
+
+  for (int i = 0; i < table_meta.field_num(); ++i) 
+  {
+      const FieldMeta* field_meta = table_meta.field(i);
+      fields.emplace_back(table, field_meta);
+  }
+
+  auto table_get_oper = std::make_unique<TableGetLogicalOperator>(table, fields, false /* readonly */);
+
+  unique_ptr<LogicalOperator> filter_oper;
+  if (update_stmt->filter_stmt()) 
+  {
+      RC rc = create_plan(update_stmt->filter_stmt(), filter_oper);
+      if (rc != RC::SUCCESS) return rc;
+  }
+  auto update_oper = std::make_unique<UpdateLogicalOperator>(table, *update_stmt->values(), update_stmt->attribute_name().c_str());
+
+  if (filter_oper) 
+  {
+    filter_oper->add_child(std::move(table_get_oper));
+    update_oper->add_child(std::move(filter_oper));
+  } 
+  else update_oper->add_child(std::move(table_get_oper));
+
+  logical_operator = std::move(update_oper);
+  return RC::SUCCESS;
 }

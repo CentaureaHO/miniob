@@ -1,0 +1,53 @@
+相关函数声明
+|-------insert_record(Function)
+|	|-------record_manager.h(File)
+|	|	|-------RecordPageHandler(Class)
+|	|	|	|-------RC insert_record(const char *data, RID *rid);
+|	|	|-------RecordFileHandler(Class)
+|	|		|-------RC insert_record(const char *data, int record_size, RID *rid);
+|	|-------table.h(File)
+|	|	|-------Table(Class)
+|	|		|-------RC insert_record(Record &record);
+|	|-------trx.h(File)
+|	|	|-------Trx(Class)
+|	|		|-------virtual RC insert_record(Table *table, Record &record) = 0;
+|	|-------mvcc_trx.h(File)
+|	|	|-------MvccTrx: Trx(Class)
+|	|		|-------RC insert_record(Table *table, Record &record) override;
+|	|-------vacuous_trx.h(File)
+|		|-------VacuousTrx: Trx(Class)
+|			|-------RC insert_record(Table *table, Record &record) override;
+|-------delete_record(Function)
+|	|-------record_manager.h(File)
+|	|	|-------RecordPageHandler(Class)
+|	|	|	|-------RC delete_record(const RID *rid);
+|	|	|-------RecordFileHandler(Class)
+|	|		|-------RC delete_record(const RID *rid);
+|	|-------table.cpp(File)
+|	|	|-------Table(Class)
+|	|		|-------RC delete_record(const Record &record);
+|	|-------trx.h(File)
+|	|	|-------Trx(Class)
+|	|		|-------virtual RC delete_record(Table *table, Record &record) = 0;
+|	|-------mvcc_trx.h(File)
+|	|	|-------MvccTrx: Trx(Class)
+|	|		|-------RC delete_record(Table *table, Record &record) override;
+|	|-------vacuout_trx.h(File)
+|	|	|-------VacuoutTrx: Trx(Class)
+|	|		|-------RC delete_record(Table *table, Record &record) override;
+|-------visit_record(Function)
+	|-------record_manager.h(File)
+	|	|-------RecordFileHandler(Class)
+	|		|-------RC visit_record(const RID &rid, bool readonly, std::function<void(Record &)> visitor);
+	|-------table.h(File)
+	|	|-------Table(Class)
+	|		|-------RC visit_record(const RID &rid, bool readonly, std::function<void(Record &)> visitor);
+	|-------trx.h(File)
+	|	|-------Trx(Class)
+	|		|-------virtual RC visit_record(Table *table, Record &record, bool readonly) = 0;
+	|-------mvcc_trx.h(File)
+	|	|-------MvccTrx: Trx(Class)
+	|		|-------RC visit_record(Table *table, Record &record, bool readonly) override;
+	|-------vacuout_trx.h
+		|-------VacuousTrx: Trx(Class)
+			|-------RC visit_record(Table *table, Record &record, bool readonly) override;

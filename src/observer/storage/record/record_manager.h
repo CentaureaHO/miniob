@@ -190,6 +190,16 @@ public:
   RC get_record(const RID *rid, Record *rec);
 
   /**
+   * @brief 更新指定RID和偏移量位置的记录数据。
+   *
+   * @param offset 记录中要更新数据的起始偏移量。
+   * @param value 包含新数据的Value对象。该对象指定了更新操作中的新值。
+   * @param rid 指定要更新的记录的RID。
+   * @note 该函数将直接修改记录中指定偏移量位置开始的数据。调用者需要确保提供的偏移量和value在记录中是有效的，以避免数据损坏。
+   */
+  RC update_record(int offset, Value& value, RID* rid);
+
+  /**
    * @brief 返回该记录页的页号
    */
   PageNum get_page_num() const;
@@ -295,6 +305,17 @@ public:
    *       如果page_handler 释放了，那也不能再访问rec对象了。
    */
   RC get_record(RecordPageHandler &page_handler, const RID *rid, bool readonly, Record *rec);
+
+  /**
+  * @brief 更新指定文件中标识符为rid的记录的内容
+  * @param offset 记录中要更新数据的起始偏移量
+  * @param value 包含新数据的Value对象，该对象指定了更新操作中的新值
+  * @param rid 待更新的记录的标识符(RID)
+  * @note 该操作会直接修改记录中从指定偏移量开始的数据内容。如果记录所在的页面为只读，或者指定的偏移量无效（例如超出了记录的大小范围），
+  *       操作将失败并返回相应的错误码。成功执行更新操作后，所在页面将被标记为脏页，意味着页面的内容已被修改并需要在合适的时机回写到磁盘。
+  *       更新操作需要确保rid指向的记录有效且存在。调用者需要确保提供的offset和value大小在记录的有效范围内，以避免数据损坏。
+  */
+  RC update_record(int offset, Value& value, RID* rid);
 
   /**
    * @brief 与get_record类似，访问某个记录，并提供回调函数来操作相应的记录

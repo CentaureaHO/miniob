@@ -275,6 +275,30 @@ RC RecordPageHandler::get_record(const RID *rid, Record *rec)
   return RC::SUCCESS;
 }
 
+RC RecordPageHandler::update_record(int offset, Value& value, RID* rid) 
+{
+  ASSERT(!readonly_, "Cannot update record on a readonly page.");
+
+  if (rid->slot_num >= page_header_->record_capacity) 
+  {
+      LOG_ERROR("Invalid slot_num %d, exceeds page's record capacity, page_num %d.", rid->slot_num, frame_->page_num());
+      return RC::INVALID_ARGUMENT;
+  }
+
+  Bitmap bitmap(bitmap_, page_header_->record_capacity);
+  if (!bitmap.get_bit(rid->slot_num)) 
+  {
+      LOG_DEBUG("Invalid slot_num %d, slot is empty, page_num %d.", rid->slot_num, frame_->page_num());
+      return RC::RECORD_NOT_EXIST;
+  }
+
+  char* ChangeLoc = frame_->data() + page_header_->first_record_offset + page_header_->record_size * rid->slot_num + offset;
+  memcpy(ChangeLoc, value.data(), value.length());
+
+  frame_->mark_dirty();
+  return RC::SUCCESS;
+}
+
 PageNum RecordPageHandler::get_page_num() const
 {
   if (nullptr == page_header_) {
@@ -463,6 +487,19 @@ RC RecordFileHandler::get_record(RecordPageHandler &page_handler, const RID *rid
   }
 
   return page_handler.get_record(rid, rec);
+}
+
+RC RecordFileHandler::update_record(int offset, Value& value, RID* rid) 
+{
+  RecordPageHandler page_handler;
+  RC rc = page_handler.init(*disk_buffer_pool_, rid->page_num, false);
+  if (rc != RC::SUCCESS) 
+  {
+    LOG_ERROR("Failed to init record_page_handler. page_number=%d. rc=%s", rid->page_num, strrc(rc));
+    return rc;
+  }
+
+  return page_handler.update_record(offset, value, rid);
 }
 
 RC RecordFileHandler::visit_record(const RID &rid, bool readonly, std::function<void(Record &)> visitor)

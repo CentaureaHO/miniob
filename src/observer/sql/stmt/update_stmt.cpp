@@ -13,14 +13,73 @@ See the Mulan PSL v2 for more details. */
 //
 
 #include "sql/stmt/update_stmt.h"
+#include <string>
+#include "common/log/log.h"
+#include "sql/stmt/filter_stmt.h"
+#include "storage/db/db.h"
+#include "storage/table/table.h"
+#include "sql/parser/DateProcessor.h"
 
-UpdateStmt::UpdateStmt(Table *table, Value *values, int value_amount)
-    : table_(table), values_(values), value_amount_(value_amount)
-{}
+UpdateStmt::UpdateStmt(Table* table, Value* values, int value_amount, FilterStmt* filter_stmt, const std::string& attribute_name)
+    : table_(table), values_(values), value_amount_(value_amount), filter_stmt_(filter_stmt), attribute_name_(attribute_name) {}
 
-RC UpdateStmt::create(Db *db, const UpdateSqlNode &update, Stmt *&stmt)
+RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt) 
 {
-  // TODO
-  stmt = nullptr;
-  return RC::INTERNAL;
+    if (!db || update.relation_name.empty() || update.attribute_name.empty()) 
+    {
+        LOG_WARN("Invalid argument. db=%p, table_name=%s", db, update.relation_name.c_str());
+        return RC::INVALID_ARGUMENT;
+    }
+
+    Table* table = db->find_table(update.relation_name.c_str());
+    if (!table) 
+    {
+        LOG_WARN("No such table. db=%s, table_name=%s", db->name(), update.relation_name.c_str());
+        return RC::SCHEMA_TABLE_NOT_EXIST;
+    }
+
+    std::unordered_map<std::string, Table*> table_map;
+    table_map[update.relation_name] = table;
+
+    FilterStmt* filter_stmt = nullptr;
+    RC rc = FilterStmt::create(db, table, &table_map, update.conditions.data(), update.conditions.size(), filter_stmt);
+    if (rc != RC::SUCCESS) 
+    {
+        LOG_WARN("Failed to create filter statement. rc=%d:%s", rc, strrc(rc));
+        return rc;
+    }
+
+    if (update.value.attr_type() == DATES && !CheckDate(update.value.get_int())) 
+    {
+        LOG_WARN("Invalid date input.");
+        return RC::INVALID_ARGUMENT;
+    }
+
+    const TableMeta& table_meta = table->table_meta();
+    const FieldMeta* field_meta = nullptr;
+    for (int i = 0; i < table_meta.field_num(); ++i) 
+    {
+        const FieldMeta* current = table_meta.field(i);
+        if (current->name() == update.attribute_name) 
+        {
+            field_meta = current;
+            break;
+        }
+    }
+
+    if (!field_meta) 
+    {
+        LOG_WARN("Field '%s' not found in table '%s'.", update.attribute_name.c_str(), update.relation_name.c_str());
+        return RC::SCHEMA_FIELD_MISSING;
+    }
+
+    if (field_meta->type() != update.value.attr_type()) 
+    {
+        LOG_WARN("Type mismatch. Cannot update a %s field with a %s value.", 
+                 attr_type_to_string(field_meta->type()), attr_type_to_string(update.value.attr_type()));
+        return RC::INVALID_ARGUMENT;
+    }
+
+    stmt = new UpdateStmt(table, const_cast<Value*>(&update.value), 1, filter_stmt, update.attribute_name);
+    return RC::SUCCESS;
 }
