@@ -18,7 +18,7 @@ See the Mulan PSL v2 for more details. */
 #include "sql/stmt/filter_stmt.h"
 #include "storage/db/db.h"
 #include "storage/table/table.h"
-#include "sql/parser/DateProcessor.h"
+#include "common/lang/string.h"
 
 UpdateStmt::UpdateStmt(Table* table, Value* values, int value_amount, FilterStmt* filter_stmt, const std::string& attribute_name)
     : table_(table), values_(values), value_amount_(value_amount), filter_stmt_(filter_stmt), attribute_name_(attribute_name) {}
@@ -49,7 +49,7 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt)
         return rc;
     }
 
-    if (update.value.attr_type() == DATES && !CheckDate(update.value.get_int())) 
+    if (update.value.attr_type() == DATES && !common::CheckDate(update.value.get_int())) 
     {
         LOG_WARN("Invalid date input.");
         return RC::INVALID_ARGUMENT;

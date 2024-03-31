@@ -19,24 +19,24 @@ See the Mulan PSL v2 for more details. */
 
 /**
  * @brief SQL调试信息
- * @details 
+ * @details
  * 希望在运行SQL时，可以直接输出一些调试信息到客户端。
  * 当前把调试信息都放在了session上，可以随着SQL语句输出。
  * 但是现在还不支持与输出调试信息与行数据同步输出。
  */
 class SqlDebug
 {
-public:
-  SqlDebug() = default;
-  virtual ~SqlDebug() = default;
+  public:
+    SqlDebug() = default;
+    virtual ~SqlDebug() = default;
 
-  void add_debug_info(const std::string &debug_info);
-  void clear_debug_info();
+    void add_debug_info(const std::string& debug_info);
+    void clear_debug_info();
 
-  const std::list<std::string> &get_debug_infos() const;
+    const std::list<std::string>& get_debug_infos() const;
 
-private:
-  std::list<std::string> debug_infos_;
+  private:
+    std::list<std::string> debug_infos_;
 };
 
 /**
@@ -45,4 +45,4 @@ private:
  * 如果当前上下文不在SQL执行过程中，那么不会生成调试信息。
  * 在普通文本场景下，调试信息会直接输出到客户端，并增加 '#' 作为前缀。
  */
-void sql_debug(const char *fmt, ...);
+void sql_debug(const char* fmt, ...);

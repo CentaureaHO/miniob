@@ -25,21 +25,19 @@ See the Mulan PSL v2 for more details. */
  */
 class TrxEndStmt : public Stmt
 {
-public:
-  TrxEndStmt(StmtType type)
-          : type_(type)
-  {}
-  virtual ~TrxEndStmt() = default;
+  public:
+    TrxEndStmt(StmtType type) : type_(type) {}
+    virtual ~TrxEndStmt() = default;
 
-  StmtType type() const override { return type_; }
+    StmtType type() const override { return type_; }
 
-  static RC create(SqlCommandFlag flag, Stmt *&stmt)
-  {
-    StmtType type = flag == SqlCommandFlag::SCF_COMMIT ? StmtType::COMMIT : StmtType::ROLLBACK;
-    stmt = new TrxEndStmt(type);
-    return RC::SUCCESS;
-  }
+    static RC create(SqlCommandFlag flag, Stmt*& stmt)
+    {
+        StmtType type = flag == SqlCommandFlag::SCF_COMMIT ? StmtType::COMMIT : StmtType::ROLLBACK;
+        stmt = new TrxEndStmt(type);
+        return RC::SUCCESS;
+    }
 
-private:
-  StmtType type_;
+  private:
+    StmtType type_;
 };

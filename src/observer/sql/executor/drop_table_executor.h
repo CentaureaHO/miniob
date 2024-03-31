@@ -4,11 +4,11 @@
 
 class SQLStageEvent;
 
-class DropTableExecutor 
+class DropTableExecutor
 {
-public:
-  DropTableExecutor() = default;
-  virtual ~DropTableExecutor() = default;
+  public:
+    DropTableExecutor() = default;
+    virtual ~DropTableExecutor() = default;
 
-  RC execute(SQLStageEvent *sql_event);
+    RC execute(SQLStageEvent* sql_event);
 };

@@ -21,17 +21,17 @@ See the Mulan PSL v2 for more details. */
 #include "sql/expr/expression.h"
 #include "sql/optimizer/rewrite_rule.h"
 
-class ExpressionRewriter : public RewriteRule 
+class ExpressionRewriter : public RewriteRule
 {
-public:
-  ExpressionRewriter();
-  virtual ~ExpressionRewriter() = default;
+  public:
+    ExpressionRewriter();
+    virtual ~ExpressionRewriter() = default;
 
-  RC rewrite(std::unique_ptr<LogicalOperator> &oper, bool &change_made) override;
+    RC rewrite(std::unique_ptr<LogicalOperator>& oper, bool& change_made) override;
 
-private:
-  RC rewrite_expression(std::unique_ptr<Expression> &expr, bool &change_made);
+  private:
+    RC rewrite_expression(std::unique_ptr<Expression>& expr, bool& change_made);
 
-private:
-  std::vector<std::unique_ptr<ExpressionRewriteRule>> expr_rewrite_rules_;
+  private:
+    std::vector<std::unique_ptr<ExpressionRewriteRule>> expr_rewrite_rules_;
 };

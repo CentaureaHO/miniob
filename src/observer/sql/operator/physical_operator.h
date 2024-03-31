@@ -37,17 +37,17 @@ class Trx;
  */
 enum class PhysicalOperatorType
 {
-  TABLE_SCAN,
-  INDEX_SCAN,
-  NESTED_LOOP_JOIN,
-  EXPLAIN,
-  PREDICATE,
-  PROJECT,
-  CALC,
-  STRING_LIST,
-  DELETE,
-  INSERT,
-  UPDATE,
+    TABLE_SCAN,
+    INDEX_SCAN,
+    NESTED_LOOP_JOIN,
+    EXPLAIN,
+    PREDICATE,
+    PROJECT,
+    CALC,
+    STRING_LIST,
+    DELETE,
+    INSERT,
+    UPDATE,
 };
 
 /**
@@ -56,35 +56,29 @@ enum class PhysicalOperatorType
  */
 class PhysicalOperator
 {
-public:
-  PhysicalOperator() = default;
+  public:
+    PhysicalOperator() = default;
 
-  virtual ~PhysicalOperator();
+    virtual ~PhysicalOperator();
 
-  /**
-   * 这两个函数是为了打印时使用的，比如在explain中
-   */
-  virtual std::string name() const;
-  virtual std::string param() const;
+    /**
+     * 这两个函数是为了打印时使用的，比如在explain中
+     */
+    virtual std::string name() const;
+    virtual std::string param() const;
 
-  virtual PhysicalOperatorType type() const = 0;
+    virtual PhysicalOperatorType type() const = 0;
 
-  virtual RC open(Trx *trx) = 0;
-  virtual RC next() = 0;
-  virtual RC close() = 0;
+    virtual RC open(Trx* trx) = 0;
+    virtual RC next() = 0;
+    virtual RC close() = 0;
 
-  virtual Tuple *current_tuple() = 0;
+    virtual Tuple* current_tuple() = 0;
 
-  void add_child(std::unique_ptr<PhysicalOperator> oper)
-  {
-    children_.emplace_back(std::move(oper));
-  }
+    void add_child(std::unique_ptr<PhysicalOperator> oper) { children_.emplace_back(std::move(oper)); }
 
-  std::vector<std::unique_ptr<PhysicalOperator>> &children()
-  {
-    return children_;
-  }
+    std::vector<std::unique_ptr<PhysicalOperator>>& children() { return children_; }
 
-protected:
-  std::vector<std::unique_ptr<PhysicalOperator>> children_;
+  protected:
+    std::vector<std::unique_ptr<PhysicalOperator>> children_;
 };

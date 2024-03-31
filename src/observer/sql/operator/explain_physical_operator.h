@@ -22,24 +22,21 @@ See the Mulan PSL v2 for more details. */
  */
 class ExplainPhysicalOperator : public PhysicalOperator
 {
-public:
-  ExplainPhysicalOperator() = default;
-  virtual ~ExplainPhysicalOperator() = default;
+  public:
+    ExplainPhysicalOperator() = default;
+    virtual ~ExplainPhysicalOperator() = default;
 
-  PhysicalOperatorType type() const override
-  {
-    return PhysicalOperatorType::EXPLAIN;
-  }
+    PhysicalOperatorType type() const override { return PhysicalOperatorType::EXPLAIN; }
 
-  RC open(Trx *trx) override;
-  RC next() override;
-  RC close() override;
-  Tuple *current_tuple() override;
+    RC     open(Trx* trx) override;
+    RC     next() override;
+    RC     close() override;
+    Tuple* current_tuple() override;
 
-private:
-  void to_string(std::ostream &os, PhysicalOperator *oper, int level, bool last_child, std::vector<bool> &ends);
+  private:
+    void to_string(std::ostream& os, PhysicalOperator* oper, int level, bool last_child, std::vector<bool>& ends);
 
-private:
-  std::string physical_plan_;
-  ValueListTuple tuple_;
+  private:
+    std::string    physical_plan_;
+    ValueListTuple tuple_;
 };

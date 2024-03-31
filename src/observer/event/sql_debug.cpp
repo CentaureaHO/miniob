@@ -20,45 +20,32 @@ See the Mulan PSL v2 for more details. */
 
 using namespace std;
 
-void SqlDebug::add_debug_info(const std::string &debug_info)
+void SqlDebug::add_debug_info(const std::string& debug_info) { debug_infos_.push_back(debug_info); }
+
+void SqlDebug::clear_debug_info() { debug_infos_.clear(); }
+
+const list<string>& SqlDebug::get_debug_infos() const { return debug_infos_; }
+
+void sql_debug(const char* fmt, ...)
 {
-  debug_infos_.push_back(debug_info);
-}
+    Session* session = Session::current_session();
+    if (nullptr == session) { return; }
 
-void SqlDebug::clear_debug_info()
-{
-  debug_infos_.clear();
-}
+    SessionEvent* request = session->current_request();
+    if (nullptr == request) { return; }
 
-const list<string> &SqlDebug::get_debug_infos() const
-{
-  return debug_infos_;
-}
+    SqlDebug& sql_debug = request->sql_debug();
 
-void sql_debug(const char *fmt, ...)
-{
-  Session *session  = Session::current_session();
-  if (nullptr == session) {
-    return;
-  }
+    const int buffer_size = 4096;
+    char*     str = new char[buffer_size];
 
-  SessionEvent *request = session->current_request();
-  if (nullptr == request) {
-    return ;
-  }
+    va_list ap;
+    va_start(ap, fmt);
+    vsnprintf(str, buffer_size, fmt, ap);
+    va_end(ap);
 
-  SqlDebug &sql_debug = request->sql_debug();
+    sql_debug.add_debug_info(str);
+    LOG_DEBUG("sql debug info: [%s]", str);
 
-  const int buffer_size = 4096;
-  char *str = new char[buffer_size];
-
-  va_list ap;
-  va_start(ap, fmt);
-  vsnprintf(str, buffer_size, fmt, ap);
-  va_end(ap);
-
-  sql_debug.add_debug_info(str);
-  LOG_DEBUG("sql debug info: [%s]", str);
-
-  delete[] str;
+    delete[] str;
 }

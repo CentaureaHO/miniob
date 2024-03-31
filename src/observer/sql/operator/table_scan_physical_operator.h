@@ -26,37 +26,32 @@ class Table;
  */
 class TableScanPhysicalOperator : public PhysicalOperator
 {
-public:
-  TableScanPhysicalOperator(Table *table, bool readonly) 
-      : table_(table), readonly_(readonly)
-  {}
+  public:
+    TableScanPhysicalOperator(Table* table, bool readonly) : table_(table), readonly_(readonly) {}
 
-  virtual ~TableScanPhysicalOperator() = default;
+    virtual ~TableScanPhysicalOperator() = default;
 
-  std::string param() const override;
+    std::string param() const override;
 
-  PhysicalOperatorType type() const override
-  {
-    return PhysicalOperatorType::TABLE_SCAN;
-  }
+    PhysicalOperatorType type() const override { return PhysicalOperatorType::TABLE_SCAN; }
 
-  RC open(Trx *trx) override;
-  RC next() override;
-  RC close() override;
+    RC open(Trx* trx) override;
+    RC next() override;
+    RC close() override;
 
-  Tuple *current_tuple() override;
+    Tuple* current_tuple() override;
 
-  void set_predicates(std::vector<std::unique_ptr<Expression>> &&exprs);
+    void set_predicates(std::vector<std::unique_ptr<Expression>>&& exprs);
 
-private:
-  RC filter(RowTuple &tuple, bool &result);
+  private:
+    RC filter(RowTuple& tuple, bool& result);
 
-private:
-  Table *                                  table_ = nullptr;
-  Trx *                                    trx_ = nullptr;
-  bool                                     readonly_ = false;
-  RecordFileScanner                        record_scanner_;
-  Record                                   current_record_;
-  RowTuple                                 tuple_;
-  std::vector<std::unique_ptr<Expression>> predicates_; // TODO chang predicate to table tuple filter
+  private:
+    Table*                                   table_ = nullptr;
+    Trx*                                     trx_ = nullptr;
+    bool                                     readonly_ = false;
+    RecordFileScanner                        record_scanner_;
+    Record                                   current_record_;
+    RowTuple                                 tuple_;
+    std::vector<std::unique_ptr<Expression>> predicates_;  // TODO chang predicate to table tuple filter
 };

@@ -28,21 +28,21 @@ class Db;
  */
 class CreateTableStmt : public Stmt
 {
-public:
-  CreateTableStmt(const std::string &table_name, const std::vector<AttrInfoSqlNode> &attr_infos)
-        : table_name_(table_name),
-          attr_infos_(attr_infos)
-  {}
-  virtual ~CreateTableStmt() = default;
+  public:
+    CreateTableStmt(const std::string& table_name, const std::vector<AttrInfoSqlNode>& attr_infos)
+        : table_name_(table_name), attr_infos_(attr_infos)
+    {
+    }
+    virtual ~CreateTableStmt() = default;
 
-  StmtType type() const override { return StmtType::CREATE_TABLE; }
+    StmtType type() const override { return StmtType::CREATE_TABLE; }
 
-  const std::string &table_name() const { return table_name_; }
-  const std::vector<AttrInfoSqlNode> &attr_infos() const { return attr_infos_; }
+    const std::string&                  table_name() const { return table_name_; }
+    const std::vector<AttrInfoSqlNode>& attr_infos() const { return attr_infos_; }
 
-  static RC create(Db *db, const CreateTableSqlNode &create_table, Stmt *&stmt);
+    static RC create(Db* db, const CreateTableSqlNode& create_table, Stmt*& stmt);
 
-private:
-  std::string table_name_;
-  std::vector<AttrInfoSqlNode> attr_infos_;
+  private:
+    std::string                  table_name_;
+    std::vector<AttrInfoSqlNode> attr_infos_;
 };

@@ -16,5 +16,5 @@ See the Mulan PSL v2 for more details. */
 
 PredicateLogicalOperator::PredicateLogicalOperator(std::unique_ptr<Expression> expression)
 {
-  expressions_.emplace_back(std::move(expression));
+    expressions_.emplace_back(std::move(expression));
 }

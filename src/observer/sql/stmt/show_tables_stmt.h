@@ -28,15 +28,15 @@ class Db;
  */
 class ShowTablesStmt : public Stmt
 {
-public:
-  ShowTablesStmt() = default;
-  virtual ~ShowTablesStmt() = default;
+  public:
+    ShowTablesStmt() = default;
+    virtual ~ShowTablesStmt() = default;
 
-  StmtType type() const override { return StmtType::SHOW_TABLES; }
+    StmtType type() const override { return StmtType::SHOW_TABLES; }
 
-  static RC create(Db *db, Stmt *&stmt)
-  {
-    stmt = new ShowTablesStmt();
-    return RC::SUCCESS;
-  }
+    static RC create(Db* db, Stmt*& stmt)
+    {
+        stmt = new ShowTablesStmt();
+        return RC::SUCCESS;
+    }
 };

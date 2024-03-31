@@ -27,36 +27,36 @@ See the Mulan PSL v2 for more details. */
 
 using namespace common;
 
-RC ParseStage::handle_request(SQLStageEvent *sql_event)
+RC ParseStage::handle_request(SQLStageEvent* sql_event)
 {
-  RC rc = RC::SUCCESS;
-  
-  SqlResult *sql_result = sql_event->session_event()->sql_result();
-  const std::string &sql = sql_event->sql();
+    RC rc = RC::SUCCESS;
 
-  ParsedSqlResult parsed_sql_result;
+    SqlResult*         sql_result = sql_event->session_event()->sql_result();
+    const std::string& sql = sql_event->sql();
 
-  parse(sql.c_str(), &parsed_sql_result);
-  if (parsed_sql_result.sql_nodes().empty()) {
-    sql_result->set_return_code(RC::SUCCESS);
-    sql_result->set_state_string("");
-    return RC::INTERNAL;
-  }
+    ParsedSqlResult parsed_sql_result;
 
-  if (parsed_sql_result.sql_nodes().size() > 1) {
-    LOG_WARN("got multi sql commands but only 1 will be handled");
-  }
+    parse(sql.c_str(), &parsed_sql_result);
+    if (parsed_sql_result.sql_nodes().empty())
+    {
+        sql_result->set_return_code(RC::SUCCESS);
+        sql_result->set_state_string("");
+        return RC::INTERNAL;
+    }
 
-  std::unique_ptr<ParsedSqlNode> sql_node = std::move(parsed_sql_result.sql_nodes().front());
-  if (sql_node->flag == SCF_ERROR) {
-    // set error information to event
-    rc = RC::SQL_SYNTAX;
-    sql_result->set_return_code(rc);
-    sql_result->set_state_string("Failed to parse sql");
-    return rc;
-  }
+    if (parsed_sql_result.sql_nodes().size() > 1) { LOG_WARN("got multi sql commands but only 1 will be handled"); }
 
-  sql_event->set_sql_node(std::move(sql_node));
+    std::unique_ptr<ParsedSqlNode> sql_node = std::move(parsed_sql_result.sql_nodes().front());
+    if (sql_node->flag == SCF_ERROR)
+    {
+        // set error information to event
+        rc = RC::SQL_SYNTAX;
+        sql_result->set_return_code(rc);
+        sql_result->set_state_string("Failed to parse sql");
+        return rc;
+    }
 
-  return RC::SUCCESS;
+    sql_event->set_sql_node(std::move(sql_node));
+
+    return RC::SUCCESS;
 }

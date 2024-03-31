@@ -19,66 +19,49 @@ See the Mulan PSL v2 for more details. */
 
 class CalcPhysicalOperator : public PhysicalOperator
 {
-public:
-  CalcPhysicalOperator(std::vector<std::unique_ptr<Expression>> &&expressions)
-    : expressions_(std::move(expressions)), tuple_(expressions_)
-  {}
-
-  virtual ~CalcPhysicalOperator() = default;
-
-  PhysicalOperatorType type() const override
-  {
-    return PhysicalOperatorType::CALC;
-  }
-
-  std::string name() const override
-  {
-    return "CALC";
-  }
-  std::string param() const override
-  {
-    return "";
-  }
-
-  RC open(Trx *trx) override { return RC::SUCCESS;}
-  RC next() override
-  {
-    RC rc = RC::SUCCESS;
-    if (emitted_) {
-      rc = RC::RECORD_EOF;
-      return rc;
+  public:
+    CalcPhysicalOperator(std::vector<std::unique_ptr<Expression>>&& expressions)
+        : expressions_(std::move(expressions)), tuple_(expressions_)
+    {
     }
-    emitted_ = true;
 
-    int cell_num = tuple_.cell_num();
-    for (int i = 0; i < cell_num; i++) {
-      Value value;
-      rc = tuple_.cell_at(i, value);
-      if (OB_FAIL(rc)) {
-        return rc;
-      }
+    virtual ~CalcPhysicalOperator() = default;
+
+    PhysicalOperatorType type() const override { return PhysicalOperatorType::CALC; }
+
+    std::string name() const override { return "CALC"; }
+    std::string param() const override { return ""; }
+
+    RC open(Trx* trx) override { return RC::SUCCESS; }
+    RC next() override
+    {
+        RC rc = RC::SUCCESS;
+        if (emitted_)
+        {
+            rc = RC::RECORD_EOF;
+            return rc;
+        }
+        emitted_ = true;
+
+        int cell_num = tuple_.cell_num();
+        for (int i = 0; i < cell_num; i++)
+        {
+            Value value;
+            rc = tuple_.cell_at(i, value);
+            if (OB_FAIL(rc)) { return rc; }
+        }
+        return RC::SUCCESS;
     }
-    return RC::SUCCESS;
-  }
-  RC close() override { return RC::SUCCESS; }
+    RC close() override { return RC::SUCCESS; }
 
-  int cell_num() const
-  {
-    return tuple_.cell_num();
-  }
+    int cell_num() const { return tuple_.cell_num(); }
 
-  Tuple *current_tuple() override
-  {
-    return &tuple_;
-  }
+    Tuple* current_tuple() override { return &tuple_; }
 
-  const std::vector<std::unique_ptr<Expression>> &expressions() const
-  {
-    return expressions_;
-  }
+    const std::vector<std::unique_ptr<Expression>>& expressions() const { return expressions_; }
 
-private:
-  std::vector<std::unique_ptr<Expression>> expressions_;
-  ExpressionTuple tuple_;
-  bool emitted_ = false;
+  private:
+    std::vector<std::unique_ptr<Expression>> expressions_;
+    ExpressionTuple                          tuple_;
+    bool                                     emitted_ = false;
 };

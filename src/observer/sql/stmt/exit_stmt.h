@@ -25,16 +25,15 @@ See the Mulan PSL v2 for more details. */
  */
 class ExitStmt : public Stmt
 {
-public:
-  ExitStmt()
-  {}
-  virtual ~ExitStmt() = default;
+  public:
+    ExitStmt() {}
+    virtual ~ExitStmt() = default;
 
-  StmtType type() const override { return StmtType::EXIT; }
+    StmtType type() const override { return StmtType::EXIT; }
 
-  static RC create(Stmt *&stmt)
-  {
-    stmt = new ExitStmt();
-    return RC::SUCCESS;
-  }
+    static RC create(Stmt*& stmt)
+    {
+        stmt = new ExitStmt();
+        return RC::SUCCESS;
+    }
 };

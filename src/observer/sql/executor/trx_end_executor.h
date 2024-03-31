@@ -28,24 +28,20 @@ See the Mulan PSL v2 for more details. */
  */
 class TrxEndExecutor
 {
-public:
-  TrxEndExecutor() = default;
-  virtual ~TrxEndExecutor() = default;
+  public:
+    TrxEndExecutor() = default;
+    virtual ~TrxEndExecutor() = default;
 
-  RC execute(SQLStageEvent *sql_event)
-  {
-    Stmt *stmt = sql_event->stmt();
-    SessionEvent *session_event = sql_event->session_event();
+    RC execute(SQLStageEvent* sql_event)
+    {
+        Stmt*         stmt = sql_event->stmt();
+        SessionEvent* session_event = sql_event->session_event();
 
-    Session *session = session_event->session();
-    session->set_trx_multi_operation_mode(false);
-    Trx *trx = session->current_trx();
+        Session* session = session_event->session();
+        session->set_trx_multi_operation_mode(false);
+        Trx* trx = session->current_trx();
 
-    if (stmt->type() == StmtType::COMMIT) {
-      return trx->commit();
+        if (stmt->type() == StmtType::COMMIT) { return trx->commit(); }
+        else { return trx->rollback(); }
     }
-    else {
-      return trx->rollback();
-    }
-  }
 };

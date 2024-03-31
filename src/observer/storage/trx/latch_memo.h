@@ -23,60 +23,61 @@ See the Mulan PSL v2 for more details. */
 class Frame;
 class DiskBufferPool;
 
-namespace common {
-class SharedMutex;
+namespace common
+{
+    class SharedMutex;
 }
 
 enum class LatchMemoType
 {
-  NONE,
-  SHARED,
-  EXCLUSIVE,
-  PIN,
+    NONE,
+    SHARED,
+    EXCLUSIVE,
+    PIN,
 };
 
 struct LatchMemoItem
 {
-  LatchMemoItem() = default;
-  LatchMemoItem(LatchMemoType type, Frame *frame);
-  LatchMemoItem(LatchMemoType type, common::SharedMutex *lock);
+    LatchMemoItem() = default;
+    LatchMemoItem(LatchMemoType type, Frame* frame);
+    LatchMemoItem(LatchMemoType type, common::SharedMutex* lock);
 
-  LatchMemoType type = LatchMemoType::NONE;
-  Frame *frame = nullptr;
-  common::SharedMutex *lock = nullptr;
+    LatchMemoType        type = LatchMemoType::NONE;
+    Frame*               frame = nullptr;
+    common::SharedMutex* lock = nullptr;
 };
 
 class LatchMemo final
 {
-public:
-  /**
-   * @brief 当前遇到的场景都是针对单个BufferPool的，不过从概念上讲，不一定做这个限制
-   */
-  LatchMemo(DiskBufferPool *buffer_pool);
-  ~LatchMemo();
+  public:
+    /**
+     * @brief 当前遇到的场景都是针对单个BufferPool的，不过从概念上讲，不一定做这个限制
+     */
+    LatchMemo(DiskBufferPool* buffer_pool);
+    ~LatchMemo();
 
-  RC   get_page(PageNum page_num, Frame *&frame);
-  RC   allocate_page(Frame *&frame);
-  void dispose_page(PageNum page_num);
-  void latch(Frame *frame, LatchMemoType type);
-  void xlatch(Frame *frame);
-  void slatch(Frame *frame);
-  bool try_slatch(Frame *frame);
+    RC   get_page(PageNum page_num, Frame*& frame);
+    RC   allocate_page(Frame*& frame);
+    void dispose_page(PageNum page_num);
+    void latch(Frame* frame, LatchMemoType type);
+    void xlatch(Frame* frame);
+    void slatch(Frame* frame);
+    bool try_slatch(Frame* frame);
 
-  void xlatch(common::SharedMutex *lock);
-  void slatch(common::SharedMutex *lock);
+    void xlatch(common::SharedMutex* lock);
+    void slatch(common::SharedMutex* lock);
 
-  void release();
+    void release();
 
-  void release_to(int point);
+    void release_to(int point);
 
-  int  memo_point() const { return static_cast<int>(items_.size()); }
+    int memo_point() const { return static_cast<int>(items_.size()); }
 
-private:
-  void release_item(LatchMemoItem &item);
-  
-private:
-  DiskBufferPool *           buffer_pool_ = nullptr;
-  std::deque<LatchMemoItem>  items_;
-  std::vector<PageNum>       disposed_pages_;
+  private:
+    void release_item(LatchMemoItem& item);
+
+  private:
+    DiskBufferPool*           buffer_pool_ = nullptr;
+    std::deque<LatchMemoItem> items_;
+    std::vector<PageNum>      disposed_pages_;
 };

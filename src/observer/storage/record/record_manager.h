@@ -29,7 +29,7 @@ class Table;
 /**
  * @brief 这里负责管理在一个文件上表记录(行)的组织/管理
  * @defgroup RecordManager
- * 
+ *
  * @details 表记录管理的内容包括如何在文件上存放、读取、检索。也就是记录的增删改查。
  * 这里的文件都会被拆分成页面，每个页面都有一样的大小。更详细的信息可以参考BufferPool。
  * 按照BufferPool的设计，第一个页面用来存放BufferPool本身的元数据，比如当前文件有多少页面、已经分配了多少页面、
@@ -62,11 +62,11 @@ class Table;
  */
 struct PageHeader
 {
-  int32_t record_num;           ///< 当前页面记录的个数
-  int32_t record_real_size;     ///< 每条记录的实际大小
-  int32_t record_size;          ///< 每条记录占用实际空间大小(可能对齐)
-  int32_t record_capacity;      ///< 最大记录个数
-  int32_t first_record_offset;  ///< 第一条记录的偏移量
+    int32_t record_num;           ///< 当前页面记录的个数
+    int32_t record_real_size;     ///< 每条记录的实际大小
+    int32_t record_size;          ///< 每条记录占用实际空间大小(可能对齐)
+    int32_t record_capacity;      ///< 最大记录个数
+    int32_t first_record_offset;  ///< 第一条记录的偏移量
 };
 
 /**
@@ -75,40 +75,40 @@ struct PageHeader
  */
 class RecordPageIterator
 {
-public:
-  RecordPageIterator();
-  ~RecordPageIterator();
+  public:
+    RecordPageIterator();
+    ~RecordPageIterator();
 
-  /**
-   * @brief 初始化一个迭代器
-   *
-   * @param record_page_handler 负责某个页面上记录增删改查的对象
-   * @param start_slot_num      从哪个记录开始扫描，默认是0
-   */
-  void init(RecordPageHandler &record_page_handler, SlotNum start_slot_num = 0);
+    /**
+     * @brief 初始化一个迭代器
+     *
+     * @param record_page_handler 负责某个页面上记录增删改查的对象
+     * @param start_slot_num      从哪个记录开始扫描，默认是0
+     */
+    void init(RecordPageHandler& record_page_handler, SlotNum start_slot_num = 0);
 
-  /**
-   * @brief 判断是否有下一个记录
-   */
-  bool has_next();
+    /**
+     * @brief 判断是否有下一个记录
+     */
+    bool has_next();
 
-  /**
-   * @brief 读取下一个记录到record中包括RID和数据，并更新下一个记录位置next_slot_num_
-   * 
-   * @param record 返回的下一个记录
-   */
-  RC   next(Record &record);
+    /**
+     * @brief 读取下一个记录到record中包括RID和数据，并更新下一个记录位置next_slot_num_
+     *
+     * @param record 返回的下一个记录
+     */
+    RC next(Record& record);
 
-  /**
-   * 该迭代器是否有效
-   */
-  bool is_valid() const { return record_page_handler_ != nullptr; }
+    /**
+     * 该迭代器是否有效
+     */
+    bool is_valid() const { return record_page_handler_ != nullptr; }
 
-private:
-  RecordPageHandler *record_page_handler_ = nullptr;
-  PageNum            page_num_            = BP_INVALID_PAGE_NUM;
-  common::Bitmap     bitmap_;             ///< bitmap 的相关信息可以参考 RecordPageHandler 的说明
-  SlotNum            next_slot_num_ = 0;  ///< 当前遍历到了哪一个slot
+  private:
+    RecordPageHandler* record_page_handler_ = nullptr;
+    PageNum            page_num_ = BP_INVALID_PAGE_NUM;
+    common::Bitmap     bitmap_;             ///< bitmap 的相关信息可以参考 RecordPageHandler 的说明
+    SlotNum            next_slot_num_ = 0;  ///< 当前遍历到了哪一个slot
 };
 
 /**
@@ -123,127 +123,130 @@ private:
  */
 class RecordPageHandler
 {
-public:
-  RecordPageHandler() = default;
-  ~RecordPageHandler();
+  public:
+    RecordPageHandler() = default;
+    ~RecordPageHandler();
 
-  /**
-   * @brief 初始化
-   *
-   * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
-   * @param page_num    当前处理哪个页面
-   * @param readonly    是否只读。在访问页面时，需要对页面加锁
-   */
-  RC init(DiskBufferPool &buffer_pool, PageNum page_num, bool readonly);
+    /**
+     * @brief 初始化
+     *
+     * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
+     * @param page_num    当前处理哪个页面
+     * @param readonly    是否只读。在访问页面时，需要对页面加锁
+     */
+    RC init(DiskBufferPool& buffer_pool, PageNum page_num, bool readonly);
 
-  /**
-   * @brief 数据库恢复时，与普通的运行场景有所不同，不做任何并发操作，也不需要加锁
-   * 
-   * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
-   * @param page_num    操作的页面编号
-   */
-  RC recover_init(DiskBufferPool &buffer_pool, PageNum page_num);
+    /**
+     * @brief 数据库恢复时，与普通的运行场景有所不同，不做任何并发操作，也不需要加锁
+     *
+     * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
+     * @param page_num    操作的页面编号
+     */
+    RC recover_init(DiskBufferPool& buffer_pool, PageNum page_num);
 
-  /**
-   * @brief 对一个新的页面做初始化，初始化关于该页面记录信息的页头PageHeader
-   *
-   * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
-   * @param page_num    当前处理哪个页面
-   * @param record_size 每个记录的大小
-   */
-  RC init_empty_page(DiskBufferPool &buffer_pool, PageNum page_num, int record_size);
+    /**
+     * @brief 对一个新的页面做初始化，初始化关于该页面记录信息的页头PageHeader
+     *
+     * @param buffer_pool 关联某个文件时，都通过buffer pool来做读写文件
+     * @param page_num    当前处理哪个页面
+     * @param record_size 每个记录的大小
+     */
+    RC init_empty_page(DiskBufferPool& buffer_pool, PageNum page_num, int record_size);
 
-  /**
-   * @brief 操作结束后做的清理工作，比如释放页面、解锁
-   */
-  RC cleanup();
+    /**
+     * @brief 操作结束后做的清理工作，比如释放页面、解锁
+     */
+    RC cleanup();
 
-  /**
-   * @brief 插入一条记录
-   *
-   * @param data 要插入的记录
-   * @param rid  如果插入成功，通过这个参数返回插入的位置
-   */
-  RC insert_record(const char *data, RID *rid);
+    /**
+     * @brief 插入一条记录
+     *
+     * @param data 要插入的记录
+     * @param rid  如果插入成功，通过这个参数返回插入的位置
+     */
+    RC insert_record(const char* data, RID* rid);
 
-  /**
-   * @brief 数据库恢复时，在指定位置插入数据
-   * 
-   * @param data 要插入的数据行
-   * @param rid  插入的位置
-   */
-  RC recover_insert_record(const char *data, const RID &rid);
+    /**
+     * @brief 数据库恢复时，在指定位置插入数据
+     *
+     * @param data 要插入的数据行
+     * @param rid  插入的位置
+     */
+    RC recover_insert_record(const char* data, const RID& rid);
 
-  /**
-   * @brief 删除指定的记录
-   *
-   * @param rid 要删除的记录标识
-   */
-  RC delete_record(const RID *rid);
+    /**
+     * @brief 删除指定的记录
+     *
+     * @param rid 要删除的记录标识
+     */
+    RC delete_record(const RID* rid);
 
-  /**
-   * @brief 获取指定位置的记录数据
-   *
-   * @param rid 指定的位置
-   * @param rec 返回指定的数据。这里不会将数据复制出来，而是使用指针，所以调用者必须保证数据使用期间受到保护
-   */
-  RC get_record(const RID *rid, Record *rec);
+    /**
+     * @brief 获取指定位置的记录数据
+     *
+     * @param rid 指定的位置
+     * @param rec 返回指定的数据。这里不会将数据复制出来，而是使用指针，所以调用者必须保证数据使用期间受到保护
+     */
+    RC get_record(const RID* rid, Record* rec);
 
-  /**
-   * @brief 更新指定RID和偏移量位置的记录数据。
-   *
-   * @param offset 记录中要更新数据的起始偏移量。
-   * @param value 包含新数据的Value对象。该对象指定了更新操作中的新值。
-   * @param rid 指定要更新的记录的RID。
-   * @note 该函数将直接修改记录中指定偏移量位置开始的数据。调用者需要确保提供的偏移量和value在记录中是有效的，以避免数据损坏。
-   */
-  RC update_record(int offset, Value& value, RID* rid);
+    /**
+     * @brief 更新指定RID和偏移量位置的记录数据。
+     *
+     * @param offset 记录中要更新数据的起始偏移量。
+     * @param value 包含新数据的Value对象。该对象指定了更新操作中的新值。
+     * @param rid 指定要更新的记录的RID。
+     * @note
+     * 该函数将直接修改记录中指定偏移量位置开始的数据。调用者需要确保提供的偏移量和value在记录中是有效的，以避免数据损坏。
+     */
+    RC update_record(int offset, Value& value, RID* rid);
 
-  /**
-   * @brief 返回该记录页的页号
-   */
-  PageNum get_page_num() const;
+    /**
+     * @brief 返回该记录页的页号
+     */
+    PageNum get_page_num() const;
 
-  /**
-   * @brief 当前页面是否已经没有空闲位置插入新的记录
-   */
-  bool is_full() const;
+    /**
+     * @brief 当前页面是否已经没有空闲位置插入新的记录
+     */
+    bool is_full() const;
 
-protected:
-  /**
-   * @details 
-   * 前面在计算record_capacity时并没有考虑对齐，但第一个record需要8字节对齐
-   * 因此按此前计算的record_capacity，最后一个记录的部分数据可能会被挤出页面
-   * 所以需要对record_capacity进行修正，保证记录不会溢出
-   */
-  void fix_record_capacity() {
-    int32_t last_record_offset = page_header_->first_record_offset + 
-                                 page_header_->record_capacity * page_header_->record_size;
-    while(last_record_offset > BP_PAGE_DATA_SIZE) {
-      page_header_->record_capacity -= 1;
-      last_record_offset -= page_header_->record_size;
+  protected:
+    /**
+     * @details
+     * 前面在计算record_capacity时并没有考虑对齐，但第一个record需要8字节对齐
+     * 因此按此前计算的record_capacity，最后一个记录的部分数据可能会被挤出页面
+     * 所以需要对record_capacity进行修正，保证记录不会溢出
+     */
+    void fix_record_capacity()
+    {
+        int32_t last_record_offset =
+            page_header_->first_record_offset + page_header_->record_capacity * page_header_->record_size;
+        while (last_record_offset > BP_PAGE_DATA_SIZE)
+        {
+            page_header_->record_capacity -= 1;
+            last_record_offset -= page_header_->record_size;
+        }
     }
-  }
 
-  /**
-   * @brief 获取指定槽位的记录数据
-   * 
-   * @param 指定的记录槽位
-   */
-  char *get_record_data(SlotNum slot_num)
-  {
-    return frame_->data() + page_header_->first_record_offset + (page_header_->record_size * slot_num);
-  }
+    /**
+     * @brief 获取指定槽位的记录数据
+     *
+     * @param 指定的记录槽位
+     */
+    char* get_record_data(SlotNum slot_num)
+    {
+        return frame_->data() + page_header_->first_record_offset + (page_header_->record_size * slot_num);
+    }
 
-protected:
-  DiskBufferPool *disk_buffer_pool_ = nullptr;  ///< 当前操作的buffer pool(文件)
-  Frame          *frame_            = nullptr;  ///< 当前操作页面关联的frame(frame的更多概念可以参考buffer pool和frame)
-  bool            readonly_         = false;    ///< 当前的操作是否都是只读的
-  PageHeader     *page_header_      = nullptr;  ///< 当前页面上页面头
-  char           *bitmap_           = nullptr;  ///< 当前页面上record分配状态信息bitmap内存起始位置
+  protected:
+    DiskBufferPool* disk_buffer_pool_ = nullptr;  ///< 当前操作的buffer pool(文件)
+    Frame* frame_ = nullptr;  ///< 当前操作页面关联的frame(frame的更多概念可以参考buffer pool和frame)
+    bool   readonly_ = false;            ///< 当前的操作是否都是只读的
+    PageHeader* page_header_ = nullptr;  ///< 当前页面上页面头
+    char*       bitmap_ = nullptr;       ///< 当前页面上record分配状态信息bitmap内存起始位置
 
-private:
-  friend class RecordPageIterator;
+  private:
+    friend class RecordPageIterator;
 };
 
 /**
@@ -253,89 +256,90 @@ private:
  */
 class RecordFileHandler
 {
-public:
-  RecordFileHandler() = default;
-  ~RecordFileHandler();
+  public:
+    RecordFileHandler() = default;
+    ~RecordFileHandler();
 
-  /**
-   * @brief 初始化
-   *
-   * @param buffer_pool 当前操作的是哪个文件
-   */
-  RC init(DiskBufferPool *buffer_pool);
+    /**
+     * @brief 初始化
+     *
+     * @param buffer_pool 当前操作的是哪个文件
+     */
+    RC init(DiskBufferPool* buffer_pool);
 
-  /**
-   * @brief 关闭，做一些资源清理的工作
-   */
-  void close();
+    /**
+     * @brief 关闭，做一些资源清理的工作
+     */
+    void close();
 
-  /**
-   * @brief 从指定文件中删除指定槽位的记录
-   * 
-   * @param rid 待删除记录的标识符
-   */
-  RC delete_record(const RID *rid);
+    /**
+     * @brief 从指定文件中删除指定槽位的记录
+     *
+     * @param rid 待删除记录的标识符
+     */
+    RC delete_record(const RID* rid);
 
-  /**
-   * @brief 插入一个新的记录到指定文件中，并返回该记录的标识符
-   * 
-   * @param data        纪录内容
-   * @param record_size 记录大小
-   * @param rid         返回该记录的标识符
-   */
-  RC insert_record(const char *data, int record_size, RID *rid);
+    /**
+     * @brief 插入一个新的记录到指定文件中，并返回该记录的标识符
+     *
+     * @param data        纪录内容
+     * @param record_size 记录大小
+     * @param rid         返回该记录的标识符
+     */
+    RC insert_record(const char* data, int record_size, RID* rid);
 
-   /**
-   * @brief 数据库恢复时，在指定文件指定位置插入数据
-   * 
-   * @param data        记录内容
-   * @param record_size 记录大小
-   * @param rid         要插入记录的指定标识符
-   */
-  RC recover_insert_record(const char *data, int record_size, const RID &rid);
+    /**
+     * @brief 数据库恢复时，在指定文件指定位置插入数据
+     *
+     * @param data        记录内容
+     * @param record_size 记录大小
+     * @param rid         要插入记录的指定标识符
+     */
+    RC recover_insert_record(const char* data, int record_size, const RID& rid);
 
-  /**
-   * @brief 获取指定文件中标识符为rid的记录内容到rec指向的记录结构中
-   * @param page_handler[in]
-   * 访问记录时，会拿住一些资源不释放，比如页面锁，使用这个对象保存相关的资源，并在析构时会自动释放
-   * @param rid 想要获取的记录ID
-   * @param readonly 获取的记录是只读的还是需要修改的
-   * @param rec[out] 通过这个参数返回获取到的记录
-   * @note rec 参数返回的记录并不会复制数据内存。page_handler 对象会拿着相关的资源，比如 pin 住页面和加上页面锁。
-   *       如果page_handler 释放了，那也不能再访问rec对象了。
-   */
-  RC get_record(RecordPageHandler &page_handler, const RID *rid, bool readonly, Record *rec);
+    /**
+     * @brief 获取指定文件中标识符为rid的记录内容到rec指向的记录结构中
+     * @param page_handler[in]
+     * 访问记录时，会拿住一些资源不释放，比如页面锁，使用这个对象保存相关的资源，并在析构时会自动释放
+     * @param rid 想要获取的记录ID
+     * @param readonly 获取的记录是只读的还是需要修改的
+     * @param rec[out] 通过这个参数返回获取到的记录
+     * @note rec 参数返回的记录并不会复制数据内存。page_handler 对象会拿着相关的资源，比如 pin 住页面和加上页面锁。
+     *       如果page_handler 释放了，那也不能再访问rec对象了。
+     */
+    RC get_record(RecordPageHandler& page_handler, const RID* rid, bool readonly, Record* rec);
 
-  /**
-  * @brief 更新指定文件中标识符为rid的记录的内容
-  * @param offset 记录中要更新数据的起始偏移量
-  * @param value 包含新数据的Value对象，该对象指定了更新操作中的新值
-  * @param rid 待更新的记录的标识符(RID)
-  * @note 该操作会直接修改记录中从指定偏移量开始的数据内容。如果记录所在的页面为只读，或者指定的偏移量无效（例如超出了记录的大小范围），
-  *       操作将失败并返回相应的错误码。成功执行更新操作后，所在页面将被标记为脏页，意味着页面的内容已被修改并需要在合适的时机回写到磁盘。
-  *       更新操作需要确保rid指向的记录有效且存在。调用者需要确保提供的offset和value大小在记录的有效范围内，以避免数据损坏。
-  */
-  RC update_record(int offset, Value& value, RID* rid);
+    /**
+     * @brief 更新指定文件中标识符为rid的记录的内容
+     * @param offset 记录中要更新数据的起始偏移量
+     * @param value 包含新数据的Value对象，该对象指定了更新操作中的新值
+     * @param rid 待更新的记录的标识符(RID)
+     * @note
+     * 该操作会直接修改记录中从指定偏移量开始的数据内容。如果记录所在的页面为只读，或者指定的偏移量无效（例如超出了记录的大小范围），
+     *       操作将失败并返回相应的错误码。成功执行更新操作后，所在页面将被标记为脏页，意味着页面的内容已被修改并需要在合适的时机回写到磁盘。
+     *       更新操作需要确保rid指向的记录有效且存在。调用者需要确保提供的offset和value大小在记录的有效范围内，以避免数据损坏。
+     */
+    RC update_record(int offset, Value& value, RID* rid);
 
-  /**
-   * @brief 与get_record类似，访问某个记录，并提供回调函数来操作相应的记录
-   *
-   * @param rid 想要访问的记录ID
-   * @param readonly 是否会修改记录
-   * @param visitor  访问记录的回调函数
-   */
-  RC visit_record(const RID &rid, bool readonly, std::function<void(Record &)> visitor);
+    /**
+     * @brief 与get_record类似，访问某个记录，并提供回调函数来操作相应的记录
+     *
+     * @param rid 想要访问的记录ID
+     * @param readonly 是否会修改记录
+     * @param visitor  访问记录的回调函数
+     */
+    RC visit_record(const RID& rid, bool readonly, std::function<void(Record&)> visitor);
 
-private:
-  /**
-   * @brief 初始化当前没有填满记录的页面，初始化free_pages_成员
-   */
-  RC init_free_pages();
+  private:
+    /**
+     * @brief 初始化当前没有填满记录的页面，初始化free_pages_成员
+     */
+    RC init_free_pages();
 
-private:
-  DiskBufferPool             *disk_buffer_pool_ = nullptr;
-  std::unordered_set<PageNum> free_pages_;  ///< 没有填充满的页面集合
-  common::Mutex               lock_;        ///< 当编译时增加-DCONCURRENCY=ON 选项时，才会真正的支持并发
+  private:
+    DiskBufferPool*             disk_buffer_pool_ = nullptr;
+    std::unordered_set<PageNum> free_pages_;  ///< 没有填充满的页面集合
+    common::Mutex               lock_;  ///< 当编译时增加-DCONCURRENCY=ON 选项时，才会真正的支持并发
 };
 
 /**
@@ -345,62 +349,62 @@ private:
  */
 class RecordFileScanner
 {
-public:
-  RecordFileScanner() = default;
-  ~RecordFileScanner();
+  public:
+    RecordFileScanner() = default;
+    ~RecordFileScanner();
 
-  /**
-   * @brief 打开一个文件扫描。
-   * @details 如果条件不为空，则要对每条记录进行条件比较，只有满足所有条件的记录才被返回
-   * @param table            遍历的哪张表
-   * @param buffer_pool      访问的文件
-   * @param readonly         当前是否只读操作。访问数据时，需要对页面加锁。比如
-   *                         删除时也需要遍历找到数据，然后删除，这时就需要加写锁
-   * @param condition_filter 做一些初步过滤操作
-   */
-  RC open_scan(Table *table, DiskBufferPool &buffer_pool, Trx *trx, bool readonly, ConditionFilter *condition_filter);
+    /**
+     * @brief 打开一个文件扫描。
+     * @details 如果条件不为空，则要对每条记录进行条件比较，只有满足所有条件的记录才被返回
+     * @param table            遍历的哪张表
+     * @param buffer_pool      访问的文件
+     * @param readonly         当前是否只读操作。访问数据时，需要对页面加锁。比如
+     *                         删除时也需要遍历找到数据，然后删除，这时就需要加写锁
+     * @param condition_filter 做一些初步过滤操作
+     */
+    RC open_scan(Table* table, DiskBufferPool& buffer_pool, Trx* trx, bool readonly, ConditionFilter* condition_filter);
 
-  /**
-   * @brief 关闭一个文件扫描，释放相应的资源
-   */
-  RC close_scan();
+    /**
+     * @brief 关闭一个文件扫描，释放相应的资源
+     */
+    RC close_scan();
 
-  /** 
-   * @brief 判断是否还有数据
-   * @details 判断完成后调用next获取下一条数据
-   */
-  bool has_next();
+    /**
+     * @brief 判断是否还有数据
+     * @details 判断完成后调用next获取下一条数据
+     */
+    bool has_next();
 
-  /**
-   * @brief 获取下一条记录
-   * 
-   * @param record 返回的下一条记录
-   * 
-   * @details 获取下一条记录之前先调用has_next()判断是否还有数据
-   */
-  RC   next(Record &record);
+    /**
+     * @brief 获取下一条记录
+     *
+     * @param record 返回的下一条记录
+     *
+     * @details 获取下一条记录之前先调用has_next()判断是否还有数据
+     */
+    RC next(Record& record);
 
-private:
-  /**
-   * @brief 获取该文件中的下一条记录
-   */
-  RC fetch_next_record();
+  private:
+    /**
+     * @brief 获取该文件中的下一条记录
+     */
+    RC fetch_next_record();
 
-  /**
-   * @brief 获取一个页面内的下一条记录
-   */
-  RC fetch_next_record_in_page();
+    /**
+     * @brief 获取一个页面内的下一条记录
+     */
+    RC fetch_next_record_in_page();
 
-private:
-  // TODO 对于一个纯粹的record遍历器来说，不应该关心表和事务
-  Table             *table_            = nullptr;  ///< 当前遍历的是哪张表。这个字段仅供事务函数使用，如果设计合适，可以去掉
-  DiskBufferPool    *disk_buffer_pool_ = nullptr;  ///< 当前访问的文件
-  Trx               *trx_              = nullptr;  ///< 当前是哪个事务在遍历
-  bool               readonly_         = false;    ///< 遍历出来的数据，是否可能对它做修改
+  private:
+    // TODO 对于一个纯粹的record遍历器来说，不应该关心表和事务
+    Table* table_ = nullptr;  ///< 当前遍历的是哪张表。这个字段仅供事务函数使用，如果设计合适，可以去掉
+    DiskBufferPool* disk_buffer_pool_ = nullptr;  ///< 当前访问的文件
+    Trx*            trx_ = nullptr;               ///< 当前是哪个事务在遍历
+    bool            readonly_ = false;            ///< 遍历出来的数据，是否可能对它做修改
 
-  BufferPoolIterator bp_iterator_;                 ///< 遍历buffer pool的所有页面
-  ConditionFilter   *condition_filter_ = nullptr;  ///< 过滤record
-  RecordPageHandler  record_page_handler_;         ///< 处理文件某页面的记录
-  RecordPageIterator record_page_iterator_;        ///< 遍历某个页面上的所有record
-  Record             next_record_;                 ///< 获取的记录放在这里缓存起来
+    BufferPoolIterator bp_iterator_;                 ///< 遍历buffer pool的所有页面
+    ConditionFilter*   condition_filter_ = nullptr;  ///< 过滤record
+    RecordPageHandler  record_page_handler_;         ///< 处理文件某页面的记录
+    RecordPageIterator record_page_iterator_;        ///< 遍历某个页面上的所有record
+    Record             next_record_;                 ///< 获取的记录放在这里缓存起来
 };

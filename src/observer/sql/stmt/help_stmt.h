@@ -25,16 +25,15 @@ See the Mulan PSL v2 for more details. */
  */
 class HelpStmt : public Stmt
 {
-public:
-  HelpStmt()
-  {}
-  virtual ~HelpStmt() = default;
+  public:
+    HelpStmt() {}
+    virtual ~HelpStmt() = default;
 
-  StmtType type() const override { return StmtType::HELP; }
+    StmtType type() const override { return StmtType::HELP; }
 
-  static RC create(Stmt *&stmt)
-  {
-    stmt = new HelpStmt();
-    return RC::SUCCESS;
-  }
+    static RC create(Stmt*& stmt)
+    {
+        stmt = new HelpStmt();
+        return RC::SUCCESS;
+    }
 };

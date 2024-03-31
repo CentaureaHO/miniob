@@ -28,35 +28,27 @@ class Table;
  * @brief 描述算术运算语句
  * @ingroup Statement
  */
-class CalcStmt : public Stmt 
+class CalcStmt : public Stmt
 {
-public:
-  CalcStmt() = default;
-  virtual ~CalcStmt() override = default;
+  public:
+    CalcStmt() = default;
+    virtual ~CalcStmt() override = default;
 
-  StmtType type() const override
-  {
-    return StmtType::CALC;
-  }
+    StmtType type() const override { return StmtType::CALC; }
 
-public:
-  static RC create(CalcSqlNode &calc_sql, Stmt *&stmt)
-  {
-    CalcStmt *calc_stmt = new CalcStmt();
-    for (Expression * const expr : calc_sql.expressions) {
-      calc_stmt->expressions_.emplace_back(expr);
+  public:
+    static RC create(CalcSqlNode& calc_sql, Stmt*& stmt)
+    {
+        CalcStmt* calc_stmt = new CalcStmt();
+        for (Expression* const expr : calc_sql.expressions) { calc_stmt->expressions_.emplace_back(expr); }
+        calc_sql.expressions.clear();
+        stmt = calc_stmt;
+        return RC::SUCCESS;
     }
-    calc_sql.expressions.clear();
-    stmt = calc_stmt;
-    return RC::SUCCESS;
-  }
 
-public:
-  std::vector<std::unique_ptr<Expression>> &expressions()
-  {
-    return expressions_;
-  }
+  public:
+    std::vector<std::unique_ptr<Expression>>& expressions() { return expressions_; }
 
-private:
-  std::vector<std::unique_ptr<Expression>> expressions_;
+  private:
+    std::vector<std::unique_ptr<Expression>> expressions_;
 };

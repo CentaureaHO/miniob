@@ -20,52 +20,48 @@ See the Mulan PSL v2 for more details. */
 
 PredicatePhysicalOperator::PredicatePhysicalOperator(std::unique_ptr<Expression> expr) : expression_(std::move(expr))
 {
-  ASSERT(expression_->value_type() == BOOLEANS, "predicate's expression should be BOOLEAN type");
+    ASSERT(expression_->value_type() == BOOLEANS, "predicate's expression should be BOOLEAN type");
 }
 
-RC PredicatePhysicalOperator::open(Trx *trx)
+RC PredicatePhysicalOperator::open(Trx* trx)
 {
-  if (children_.size() != 1) {
-    LOG_WARN("predicate operator must has one child");
-    return RC::INTERNAL;
-  }
+    if (children_.size() != 1)
+    {
+        LOG_WARN("predicate operator must has one child");
+        return RC::INTERNAL;
+    }
 
-  return children_[0]->open(trx);
+    return children_[0]->open(trx);
 }
 
 RC PredicatePhysicalOperator::next()
 {
-  RC rc = RC::SUCCESS;
-  PhysicalOperator *oper = children_.front().get();
+    RC                rc = RC::SUCCESS;
+    PhysicalOperator* oper = children_.front().get();
 
-  while (RC::SUCCESS == (rc = oper->next())) {
-    Tuple *tuple = oper->current_tuple();
-    if (nullptr == tuple) {
-      rc = RC::INTERNAL;
-      LOG_WARN("failed to get tuple from operator");
-      break;
-    }
+    while (RC::SUCCESS == (rc = oper->next()))
+    {
+        Tuple* tuple = oper->current_tuple();
+        if (nullptr == tuple)
+        {
+            rc = RC::INTERNAL;
+            LOG_WARN("failed to get tuple from operator");
+            break;
+        }
 
-    Value value;
-    rc = expression_->get_value(*tuple, value);
-    if (rc != RC::SUCCESS) {
-      return rc;
-    }
+        Value value;
+        rc = expression_->get_value(*tuple, value);
+        if (rc != RC::SUCCESS) { return rc; }
 
-    if (value.get_boolean()) {
-      return rc;
+        if (value.get_boolean()) { return rc; }
     }
-  }
-  return rc;
+    return rc;
 }
 
 RC PredicatePhysicalOperator::close()
 {
-  children_[0]->close();
-  return RC::SUCCESS;
+    children_[0]->close();
+    return RC::SUCCESS;
 }
 
-Tuple *PredicatePhysicalOperator::current_tuple()
-{
-  return children_[0]->current_tuple();
-}
+Tuple* PredicatePhysicalOperator::current_tuple() { return children_[0]->current_tuple(); }

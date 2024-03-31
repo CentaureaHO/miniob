@@ -18,18 +18,15 @@ See the Mulan PSL v2 for more details. */
 
 class SQLStageEvent;
 
-class StorageEvent : public common::StageEvent {
-public:
-  StorageEvent(SQLStageEvent *sql_event) : sql_event_(sql_event)
-  {}
+class StorageEvent : public common::StageEvent
+{
+  public:
+    StorageEvent(SQLStageEvent* sql_event) : sql_event_(sql_event) {}
 
-  virtual ~StorageEvent();
+    virtual ~StorageEvent();
 
-  SQLStageEvent *sql_event() const
-  {
-    return sql_event_;
-  }
+    SQLStageEvent* sql_event() const { return sql_event_; }
 
-private:
-  SQLStageEvent *sql_event_;
+  private:
+    SQLStageEvent* sql_event_;
 };

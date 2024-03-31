@@ -21,33 +21,33 @@ See the Mulan PSL v2 for more details. */
  */
 class VacuousTrxKit : public TrxKit
 {
-public:
-  VacuousTrxKit() = default;
-  virtual ~VacuousTrxKit() = default;
+  public:
+    VacuousTrxKit() = default;
+    virtual ~VacuousTrxKit() = default;
 
-  RC init() override;
-  const std::vector<FieldMeta> *trx_fields() const override;
-  Trx *create_trx(CLogManager *log_manager) override;
-  Trx *create_trx(int32_t trx_id) override;
-  Trx *find_trx(int32_t trx_id) override;
-  void all_trxes(std::vector<Trx *> &trxes) override;
+    RC                            init() override;
+    const std::vector<FieldMeta>* trx_fields() const override;
+    Trx*                          create_trx(CLogManager* log_manager) override;
+    Trx*                          create_trx(int32_t trx_id) override;
+    Trx*                          find_trx(int32_t trx_id) override;
+    void                          all_trxes(std::vector<Trx*>& trxes) override;
 
-  void destroy_trx(Trx *trx) override;
+    void destroy_trx(Trx* trx) override;
 };
 
 class VacuousTrx : public Trx
 {
-public:
-  VacuousTrx() = default;
-  virtual ~VacuousTrx() = default;
+  public:
+    VacuousTrx() = default;
+    virtual ~VacuousTrx() = default;
 
-  RC insert_record(Table *table, Record &record) override;
-  RC delete_record(Table *table, Record &record) override;
-  RC visit_record(Table *table, Record &record, bool readonly) override;
-  RC update_record(Table* table, Record& record, Value& value,int offset) override;
-  RC start_if_need() override;
-  RC commit() override;
-  RC rollback() override;
+    RC insert_record(Table* table, Record& record) override;
+    RC delete_record(Table* table, Record& record) override;
+    RC visit_record(Table* table, Record& record, bool readonly) override;
+    RC update_record(Table* table, Record& record, Value& value, int offset) override;
+    RC start_if_need() override;
+    RC commit() override;
+    RC rollback() override;
 
-  int32_t id() const override { return 0; }
+    int32_t id() const override { return 0; }
 };

@@ -20,45 +20,43 @@ See the Mulan PSL v2 for more details. */
 
 Rewriter::Rewriter()
 {
-  rewrite_rules_.emplace_back(new ExpressionRewriter);
-  rewrite_rules_.emplace_back(new PredicateRewriteRule);
-  rewrite_rules_.emplace_back(new PredicatePushdownRewriter);
+    rewrite_rules_.emplace_back(new ExpressionRewriter);
+    rewrite_rules_.emplace_back(new PredicateRewriteRule);
+    rewrite_rules_.emplace_back(new PredicatePushdownRewriter);
 }
 
-RC Rewriter::rewrite(std::unique_ptr<LogicalOperator> &oper, bool &change_made)
+RC Rewriter::rewrite(std::unique_ptr<LogicalOperator>& oper, bool& change_made)
 {
-  RC rc = RC::SUCCESS;
+    RC rc = RC::SUCCESS;
 
-  change_made = false;
-  for (std::unique_ptr<RewriteRule> &rule : rewrite_rules_) {
-    bool sub_change_made = false;
-    rc = rule->rewrite(oper, sub_change_made);
-    if (rc != RC::SUCCESS) {
-      LOG_WARN("failed to rewrite logical operator. rc=%s", strrc(rc));
-      return rc;
+    change_made = false;
+    for (std::unique_ptr<RewriteRule>& rule : rewrite_rules_)
+    {
+        bool sub_change_made = false;
+        rc = rule->rewrite(oper, sub_change_made);
+        if (rc != RC::SUCCESS)
+        {
+            LOG_WARN("failed to rewrite logical operator. rc=%s", strrc(rc));
+            return rc;
+        }
+
+        if (sub_change_made && !change_made) { change_made = true; }
     }
 
-    if (sub_change_made && !change_made) {
-      change_made = true;
-    }
-  }
+    if (rc != RC::SUCCESS) { return rc; }
 
-  if (rc != RC::SUCCESS) {
+    std::vector<std::unique_ptr<LogicalOperator>>& child_opers = oper->children();
+    for (auto& child_oper : child_opers)
+    {
+        bool sub_change_made = false;
+        rc = this->rewrite(child_oper, sub_change_made);
+        if (rc != RC::SUCCESS)
+        {
+            LOG_WARN("failed to rewrite child oper. rc=%s", strrc(rc));
+            return rc;
+        }
+
+        if (sub_change_made && !change_made) { change_made = true; }
+    }
     return rc;
-  }
-
-  std::vector<std::unique_ptr<LogicalOperator>> &child_opers = oper->children();
-  for (auto &child_oper : child_opers) {
-    bool sub_change_made = false;
-    rc = this->rewrite(child_oper, sub_change_made);
-    if (rc != RC::SUCCESS) {
-      LOG_WARN("failed to rewrite child oper. rc=%s", strrc(rc));
-      return rc;
-    }
-
-    if (sub_change_made && !change_made) {
-      change_made = true;
-    }
-  }
-  return rc;
 }

@@ -171,4 +171,11 @@ std::string get_type_name(const T &val)
   return sret;
 }
 
+// 为DATE类型的设计的格式转换与非法输入判断
+    extern bool IsLeapYear(int Year);
+    extern bool IsDateValid(int y, int m, int d); 
+    extern void StrDate2IntDate(const char *StrDate, int &IntDate);
+    extern std::string IntDate2StrDate(int IntDate);
+
+    extern bool CheckDate(int IntDate);
 }  // namespace common

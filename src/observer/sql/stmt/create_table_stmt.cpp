@@ -16,9 +16,9 @@ See the Mulan PSL v2 for more details. */
 #include "event/sql_debug.h"
 #include <iostream>
 
-RC CreateTableStmt::create(Db *db, const CreateTableSqlNode &create_table, Stmt *&stmt)
+RC CreateTableStmt::create(Db* db, const CreateTableSqlNode& create_table, Stmt*& stmt)
 {
-  stmt = new CreateTableStmt(create_table.relation_name, create_table.attr_infos);
-  sql_debug("create table statement: table name %s", create_table.relation_name.c_str());
-  return RC::SUCCESS;
+    stmt = new CreateTableStmt(create_table.relation_name, create_table.attr_infos);
+    sql_debug("create table statement: table name %s", create_table.relation_name.c_str());
+    return RC::SUCCESS;
 }

@@ -19,7 +19,6 @@ See the Mulan PSL v2 for more details. */
 #include "sql/parser/parse_defs.h"
 #include "sql/stmt/stmt.h"
 #include "sql/expr/expression.h"
-#include "sql/parser/DateProcessor.h"
 
 class Db;
 class Table;

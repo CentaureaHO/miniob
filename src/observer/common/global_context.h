@@ -24,11 +24,11 @@ class TrxKit;
  */
 struct GlobalContext
 {
-  BufferPoolManager *buffer_pool_manager_ = nullptr;
-  DefaultHandler *handler_ = nullptr;
-  TrxKit *trx_kit_ = nullptr;
+    BufferPoolManager* buffer_pool_manager_ = nullptr;
+    DefaultHandler*    handler_ = nullptr;
+    TrxKit*            trx_kit_ = nullptr;
 
-  static GlobalContext &instance();
+    static GlobalContext& instance();
 };
 
 #define GCTX GlobalContext::instance()

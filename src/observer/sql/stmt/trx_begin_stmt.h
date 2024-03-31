@@ -25,16 +25,15 @@ See the Mulan PSL v2 for more details. */
  */
 class TrxBeginStmt : public Stmt
 {
-public:
-  TrxBeginStmt()
-  {}
-  virtual ~TrxBeginStmt() = default;
+  public:
+    TrxBeginStmt() {}
+    virtual ~TrxBeginStmt() = default;
 
-  StmtType type() const override { return StmtType::BEGIN; }
+    StmtType type() const override { return StmtType::BEGIN; }
 
-  static RC create(Stmt *&stmt)
-  {
-    stmt = new TrxBeginStmt();
-    return RC::SUCCESS;
-  }
+    static RC create(Stmt*& stmt)
+    {
+        stmt = new TrxBeginStmt();
+        return RC::SUCCESS;
+    }
 };
