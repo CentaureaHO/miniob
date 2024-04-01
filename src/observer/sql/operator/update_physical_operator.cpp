@@ -5,6 +5,17 @@
 
 using namespace std;
 
+UpdatePhysicalOperator::UpdatePhysicalOperator(Table* table, Value& value, const char* field_name)
+    : table_(table), value_(value)
+{
+    field_name_ = new char[strlen(field_name) + 1];
+    strcpy(field_name_, field_name);
+}
+
+UpdatePhysicalOperator::~UpdatePhysicalOperator() { delete[] field_name_; }
+
+PhysicalOperatorType UpdatePhysicalOperator::type() const { return PhysicalOperatorType::UPDATE; }
+
 RC UpdatePhysicalOperator::open(Trx* trx)
 {
     if (children_.empty()) { return RC::SUCCESS; }

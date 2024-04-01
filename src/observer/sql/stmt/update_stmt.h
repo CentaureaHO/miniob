@@ -47,6 +47,13 @@ class UpdateStmt : public Stmt
     std::string attribute_name() const { return attribute_name_; }
 
   private:
+    /*
+     * table_: 表对象指针
+     * values_: 待更新的值
+     * value_amount_: 待更新的值的数量
+     * filter_stmt_: 过滤语句指针
+     * attribute_name_: 待更新的属性名
+     */
     Table*      table_ = nullptr;
     Value*      values_ = nullptr;
     int         value_amount_ = 0;

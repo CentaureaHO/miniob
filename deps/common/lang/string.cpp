@@ -262,10 +262,10 @@ namespace common
         return std::string(buf, len);
     }
 
-    /**
-     * 为日期类型设计的格式转换与非法输入判断
-     */
-    #define MinInt 0x80000000
+/**
+ * 为日期类型设计的格式转换与非法输入判断
+ */
+#define MinInt 0x80000000
     bool IsLeapYear(int Year)
     {
         if ((Year % 4 == 0 && Year % 100 != 0) || Year % 400 == 0) return 1;
@@ -341,5 +341,5 @@ namespace common
     }
 
     bool CheckDate(int IntDate) { return IntDate != MinInt; }
-    #undef MinInt
+#undef MinInt
 }  // namespace common
