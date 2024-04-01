@@ -27,6 +27,17 @@ class Expression;
  * @defgroup SQLParser SQL Parser
  */
 
+enum AggregationType
+{
+    NOTAGG,
+    UNKNOWN,
+    F_MIN,
+    F_MAX,
+    F_SUM,
+    F_AVG,
+    F_COUNT
+};
+
 /**
  * @brief 描述一个属性
  * @ingroup SQLParser
@@ -36,8 +47,22 @@ class Expression;
  */
 struct RelAttrSqlNode
 {
-    std::string relation_name;   ///< relation name (may be NULL) 表名
-    std::string attribute_name;  ///< attribute name              属性名
+    std::string     relation_name;     ///< relation name (may be NULL) 表名
+    std::string     attribute_name;    ///< attribute name              属性名
+    AggregationType aggregation_name;  ///< aggregation type
+
+    RelAttrSqlNode() : aggregation_name(NOTAGG) {}
+    RelAttrSqlNode(const char* AggType)
+    {
+        std::string AggTypeStr(AggType);
+        for (auto& c : AggTypeStr) c = toupper(c);
+        if (AggTypeStr == "MIN") { aggregation_name = F_MIN; }
+        else if (AggTypeStr == "MAX") { aggregation_name = F_MAX; }
+        else if (AggTypeStr == "SUM") { aggregation_name = F_SUM; }
+        else if (AggTypeStr == "AVG") { aggregation_name = F_AVG; }
+        else if (AggTypeStr == "COUNT") { aggregation_name = F_COUNT; }
+        else { aggregation_name = UNKNOWN; }
+    }
 };
 
 /**
