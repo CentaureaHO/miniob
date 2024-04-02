@@ -26,6 +26,8 @@ class FilterStmt;
 class Db;
 class Table;
 
+extern RC create_func(const std::string& func_name, AggregationOperator*& func_operator);
+
 /**
  * @brief 表示select语句
  * @ingroup Statement

@@ -2197,7 +2197,7 @@ yyreduce:
       }
       else
       {
-        (yyval.rel_attr)->aggregation_name = "Multi attributes";
+        (yyval.rel_attr)->aggregation_name = "mulattrs";
       }
     }
 #line 2204 "yacc_sql.cpp"

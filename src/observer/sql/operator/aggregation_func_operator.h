@@ -22,8 +22,8 @@ class AggregationOperator
 {
   public:
     AggregationOperator(): func_type_(UNKNOWN) {}
-    AggregationOperator(const std::string& func_name);
 
+    RC init(const std::string& func_name);
     RC run(std::vector<Value>& values, const char* field_name);
 
   private:

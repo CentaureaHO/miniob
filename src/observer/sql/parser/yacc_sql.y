@@ -539,7 +539,7 @@ rel_attr:
       }
       else
       {
-        $$->aggregation_name = "Multi attributes";
+        $$->aggregation_name = "mulattrs";
       }
     }
     ;
