@@ -18,6 +18,7 @@ See the Mulan PSL v2 for more details. */
 #include "common/lang/string.h"
 #include "storage/db/db.h"
 #include "storage/table/table.h"
+#include "sql/operator/aggregation_func_operator.h"
 #include <iostream>
 
 SelectStmt::~SelectStmt()

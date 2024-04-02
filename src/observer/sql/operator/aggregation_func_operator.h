@@ -11,6 +11,7 @@
  *   F_MAX,
  *   F_MIN,
  *   F_SUM,
+ *   MULATTRS,
  *   UNKNOWN,
  */
 

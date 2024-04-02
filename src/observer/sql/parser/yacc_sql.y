@@ -502,14 +502,7 @@ expression:
     ;
 
 select_attr:
-    '*' {
-      $$ = new std::vector<RelAttrSqlNode>;
-      RelAttrSqlNode attr;
-      attr.relation_name  = "";
-      attr.attribute_name = "*";
-      $$->emplace_back(attr);
-    }
-    | rel_attr attr_list {
+    rel_attr attr_list {
       if ($2 != nullptr) {
         $$ = $2;
       } else {
@@ -521,7 +514,11 @@ select_attr:
     ;
 
 rel_attr:
-    ID {
+    '*' {
+      $$ = new RelAttrSqlNode;
+      $$->attribute_name = "*";
+    }
+    | ID {
       $$ = new RelAttrSqlNode;
       $$->attribute_name = $1;
       free($1);
@@ -533,27 +530,17 @@ rel_attr:
       free($1);
       free($3);
     }
-    | ID LBRACE ID RBRACE {
-      $$ = new RelAttrSqlNode;
-      $$->aggregation_name = $1;
-      $$->attribute_name = $3;
-      free($1);
-      free($3);
-    }
-    | ID LBRACE '*' RBRACE {
-      $$ = new RelAttrSqlNode;
-      $$->aggregation_name = $1;
-      $$->attribute_name = "*";
-      free($1);
-    }
-    | ID DOT ID LBRACE ID RBRACE {
-      $$ = new RelAttrSqlNode;
-      $$->relation_name = $1;
-      $$->aggregation_name = $3;
-      $$->attribute_name = $5;
-      free($1);
-      free($3);
-      free($5);
+    | ID LBRACE rel_attr attr_list RBRACE {
+      $$ = $3;
+      if ($4 == nullptr)
+      {
+        $$->aggregation_name = $1;
+        free($1);
+      }
+      else
+      {
+        $$->aggregation_name = "Multi attributes";
+      }
     }
     ;
 

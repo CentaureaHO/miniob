@@ -13,6 +13,7 @@ const char* AGGREGATION_TYPE_NAME[] = {
     "max",
     "min",
     "sum",
+    "mulattrs",
     "unknown",
 };
 
@@ -43,11 +44,16 @@ AggregationOperator::AggregationOperator(const std::string& func_name)
 
 RC AggregationOperator::run(std::vector<Value>& values, const char* field_name)
 {
-    // 检查UNKNOWN与*
+    // 检查UNKNOWN, MULATTRS与*
     if (func_type_ == UNKNOWN)
     {
         LOG_ERROR("Unknown aggregation function: %s", func_name_.c_str());
         return RC::UNKNOWN_AGGREGATION_FUNC;
+    }
+    else if (func_type_ == MULATTRS)
+    {
+        LOG_ERROR("Aggregation function %s can't be applied to multiple attributes", func_name_.c_str());
+        return RC::AGGREGATION_UNMATCHED;
     }
     else if (0 == strcmp(field_name, "*") && func_type_ != F_COUNT)
     {
