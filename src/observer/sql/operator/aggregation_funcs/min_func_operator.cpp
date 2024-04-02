@@ -1,1 +1,0 @@
-#include "min_func_operator.h"

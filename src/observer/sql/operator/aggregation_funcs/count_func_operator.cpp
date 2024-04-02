@@ -1,1 +1,0 @@
-#include "count_func_operator.h"

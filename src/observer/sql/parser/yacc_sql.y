@@ -534,19 +534,22 @@ rel_attr:
       free($3);
     }
     | ID LBRACE ID RBRACE {
-      $$ = new RelAttrSqlNode($1);
+      $$ = new RelAttrSqlNode;
+      $$->aggregation_name = $1;
       $$->attribute_name = $3;
       free($1);
       free($3);
     }
     | ID LBRACE '*' RBRACE {
-      $$ = new RelAttrSqlNode($1);
+      $$ = new RelAttrSqlNode;
+      $$->aggregation_name = $1;
       $$->attribute_name = "*";
       free($1);
     }
     | ID DOT ID LBRACE ID RBRACE {
-      $$ = new RelAttrSqlNode($3);
+      $$ = new RelAttrSqlNode;
       $$->relation_name = $1;
+      $$->aggregation_name = $3;
       $$->attribute_name = $5;
       free($1);
       free($3);

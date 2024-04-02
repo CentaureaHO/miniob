@@ -74,8 +74,8 @@ See the Mulan PSL v2 for more details. */
     DEFINE_RC(VARIABLE_NOT_EXISTS)         \
     DEFINE_RC(VARIABLE_NOT_VALID)          \
     DEFINE_RC(LOGBUF_FULL)                 \
-    DEFINE_RC(INVALID_AGGREGATION_FUNC)    \
     DEFINE_RC(AGGREGATION_UNMATCHED)       \
+    DEFINE_RC(UNKNOWN_AGGREGATION_FUNC)    \
 
 enum class RC
 {

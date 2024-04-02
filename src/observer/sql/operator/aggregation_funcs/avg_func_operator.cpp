@@ -1,1 +1,0 @@
-#include "avg_func_operator.h"
