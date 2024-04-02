@@ -34,8 +34,12 @@ See the Mulan PSL v2 for more details. */
 #include "sql/operator/calc_physical_operator.h"
 #include "sql/operator/update_logical_operator.h"
 #include "sql/operator/update_physical_operator.h"
+#include "sql/operator/aggregate_logical_operator.h"
+#include "sql/operator/aggregate_physical_operator.h"
 #include "sql/expr/expression.h"
 #include "common/log/log.h"
+
+#include <iostream>
 
 using namespace std;
 
@@ -85,8 +89,15 @@ RC PhysicalPlanGenerator::create(LogicalOperator& logical_operator, unique_ptr<P
         }
         break;
 
-        case LogicalOperatorType::UPDATE: {
+        case LogicalOperatorType::UPDATE: 
+        {
             return create_plan(static_cast<UpdateLogicalOperator&>(logical_operator), oper);
+        }
+        break;
+
+        case LogicalOperatorType::AGGREGATE: 
+        {
+            return create_plan(static_cast<AggregationLogicalOperator&>(logical_operator), oper);
         }
         break;
 
@@ -329,5 +340,28 @@ RC PhysicalPlanGenerator::create_plan(UpdateLogicalOperator& update_oper, std::u
         std::make_unique<UpdatePhysicalOperator>(update_oper.table(), *update_oper.value(), update_oper.field_name());
     if (child_physical_oper) oper->add_child(std::move(child_physical_oper));
 
+    return RC::SUCCESS;
+}
+
+RC PhysicalPlanGenerator::create_plan(AggregationLogicalOperator& aggregate_oper, std::unique_ptr<PhysicalOperator>& oper) 
+{
+    vector<unique_ptr<LogicalOperator>> &children_opers = aggregate_oper.children();
+    ASSERT(children_opers.size() == 1, "test");
+
+    LogicalOperator& child_oper = *children_opers.front();
+    unique_ptr<PhysicalOperator> child_phy_oper; 
+    RC rc = create(child_oper, child_phy_oper);
+    if (rc != RC::SUCCESS)
+    {
+        LOG_WARN("Failed to create child operator. rc = %s", strrc(rc));
+        return rc;
+    }
+
+    AggregationPhysicalOperator* aggregate_operator = new AggregationPhysicalOperator;
+    const vector<Field>& fields = aggregate_oper.fields();
+    for (const auto& field: fields) aggregate_operator->add_aggregation(field.func());
+
+    if (child_phy_oper) aggregate_operator->add_child(std::move(child_phy_oper));
+    oper = unique_ptr<PhysicalOperator>(aggregate_operator);
     return RC::SUCCESS;
 }

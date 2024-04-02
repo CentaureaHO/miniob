@@ -19,6 +19,7 @@ See the Mulan PSL v2 for more details. */
 #include <vector>
 #include <string>
 
+#include "sql/parser/aggregation_parser.h"
 #include "sql/parser/value.h"
 
 class Expression;
@@ -27,17 +28,6 @@ class Expression;
  * @defgroup SQLParser SQL Parser
  */
 
-enum AggregationType
-{
-    NOTAGG,
-    F_AVG,
-    F_COUNT,
-    F_MAX,
-    F_MIN,
-    F_SUM,
-    MULATTRS,
-    UNKNOWN,
-};
 
 /**
  * @brief 描述一个属性
@@ -51,6 +41,15 @@ struct RelAttrSqlNode
     std::string relation_name;     ///< relation name (may be NULL) 表名
     std::string attribute_name;    ///< attribute name              属性名
     std::string aggregation_name;  ///< aggregation type
+    bool        ValidAgg;          ///< is agg valid or not
+
+    RelAttrSqlNode(bool valid = 1): aggregation_name("not_func"), ValidAgg(valid) {}
+
+    AggregationType aggr_type() const 
+    {
+        if (attribute_name == "*" && aggregation_name == "count") return F_COUNT_ALL;
+        return aggregation_type_from_string(aggregation_name.c_str());
+    }
 };
 
 /**

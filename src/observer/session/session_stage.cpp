@@ -144,7 +144,7 @@ RC SessionStage::handle_sql(SQLStageEvent* sql_event)
         LOG_TRACE("failed to do optimize. rc=%s", strrc(rc));
         return rc;
     }
-
+    
     rc = execute_stage_.handle_request(sql_event);
     if (OB_FAIL(rc))
     {

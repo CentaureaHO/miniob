@@ -30,13 +30,18 @@ SelectStmt::~SelectStmt()
     }
 }
 
-static void wildcard_fields(Table* table, std::vector<Field>& field_metas)
+static void wildcard_fields(Table* table, std::vector<Field>& field_metas, AggregationType aggr_type)
 {
     const TableMeta& table_meta = table->table_meta();
     const int        field_num = table_meta.field_num();
+    if (aggr_type == AggregationType::F_COUNT_ALL)
+    {
+        field_metas.push_back(Field(table, table_meta.field(0), aggr_type));
+        return;
+    }
     for (int i = table_meta.sys_field_num(); i < field_num; i++)
     {
-        field_metas.push_back(Field(table, table_meta.field(i)));
+        field_metas.push_back(Field(table, table_meta.field(i), aggr_type));
     }
 }
 
@@ -76,11 +81,19 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
     for (int i = static_cast<int>(select_sql.attributes.size()) - 1; i >= 0; i--)
     {
         const RelAttrSqlNode& relation_attr = select_sql.attributes[i];
-
+        if (!relation_attr.ValidAgg)
+        {
+            return RC::INVALID_ARGUMENT;
+        }
+        AggregationType aggr_type = relation_attr.aggr_type();
         if (common::is_blank(relation_attr.relation_name.c_str()) &&
             0 == strcmp(relation_attr.attribute_name.c_str(), "*"))
         {
-            for (Table* table : tables) { wildcard_fields(table, query_fields); }
+            if (aggr_type != AggregationType::F_COUNT_ALL && aggr_type != AggregationType::NOTAGG)
+            {
+                return RC::INVALID_ARGUMENT;
+            }
+            for (Table* table : tables) { wildcard_fields(table, query_fields, aggr_type); }
         }
         else if (!common::is_blank(relation_attr.relation_name.c_str()))
         {
@@ -94,7 +107,11 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                     LOG_WARN("invalid field name while table is *. attr=%s", field_name);
                     return RC::SCHEMA_FIELD_MISSING;
                 }
-                for (Table* table : tables) { wildcard_fields(table, query_fields); }
+                if (aggr_type != AggregationType::F_COUNT_ALL && aggr_type != AggregationType::NOTAGG)
+                {
+                    return RC::INVALID_ARGUMENT;
+                }
+                for (Table* table : tables) { wildcard_fields(table, query_fields, aggr_type); }
             }
             else
             {
@@ -106,7 +123,15 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                 }
 
                 Table* table = iter->second;
-                if (0 == strcmp(field_name, "*")) { wildcard_fields(table, query_fields); }
+                if (0 == strcmp(field_name, "*")) 
+                { 
+                    if (aggr_type != AggregationType::F_COUNT_ALL && aggr_type != AggregationType::NOTAGG)
+                    {
+                        LOG_WARN("invalid aggregation type. field=%s.%s.%s", db->name(), table->name(), field_name);
+                        return RC::INVALID_ARGUMENT;
+                    }
+                    wildcard_fields(table, query_fields, aggr_type);
+                }
                 else
                 {
                     const FieldMeta* field_meta = table->table_meta().field(field_name);
@@ -115,7 +140,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                         LOG_WARN("no such field. field=%s.%s.%s", db->name(), table->name(), field_name);
                         return RC::SCHEMA_FIELD_MISSING;
                     }
-                    query_fields.push_back(Field(table, field_meta));
+                    query_fields.push_back(Field(table, field_meta, aggr_type));
                 }
             }
         }
@@ -134,7 +159,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                 LOG_WARN("no such field. field=%s.%s.%s", db->name(), table->name(), relation_attr.attribute_name.c_str());
                 return RC::SCHEMA_FIELD_MISSING;
             }
-            query_fields.push_back(Field(table, field_meta));
+            query_fields.push_back(Field(table, field_meta, aggr_type));
         }
     }
 
@@ -157,7 +182,6 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
         LOG_WARN("cannot construct filter stmt");
         return rc;
     }
-
     // everything alright
     SelectStmt* select_stmt = new SelectStmt();
     // TODO add expression copy

@@ -15,16 +15,16 @@
  *   UNKNOWN,
  */
 
-const char* aggregation_type_to_string(AggregationType type);
-AggregationType aggregation_type_from_string(const char* s);
-
 class AggregationOperator
 {
   public:
-    AggregationOperator(): func_type_(UNKNOWN) {}
+    AggregationOperator(): func_type_(NOTAGG) {}
 
     RC init(const std::string& func_name);
+    RC init(AggregationType type);
     RC run(std::vector<Value>& values, const char* field_name);
+
+    AggregationType type() const { return func_type_; }
 
   private:
     AggregationType func_type_;

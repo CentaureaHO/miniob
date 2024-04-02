@@ -17,6 +17,7 @@ See the Mulan PSL v2 for more details. */
 #include <memory>
 
 #include "common/rc.h"
+#include "sql/parser/aggregation_parser.h"
 
 class Stmt;
 class CalcStmt;

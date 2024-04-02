@@ -53,7 +53,6 @@ RC ExecuteStage::handle_request(SQLStageEvent* sql_event)
 RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
 {
     RC rc = RC::SUCCESS;
-
     Stmt* stmt = sql_event->stmt();
     ASSERT(stmt != nullptr, "SQL Statement shouldn't be empty!");
 
@@ -70,8 +69,9 @@ RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
 
             for (const Field& field : select_stmt->query_fields())
             {
-                if (with_table_name) { schema.append_cell(field.table_name(), field.field_name()); }
-                else { schema.append_cell(field.field_name()); }
+                AggregationType agg_type = field.func();
+                if (with_table_name) { schema.append_cell(field.table_name(), field.field_name(), agg_type); }
+                else { schema.append_cell(field.field_name(), agg_type); }
             }
         }
         break;

@@ -539,8 +539,13 @@ rel_attr:
       }
       else
       {
+        $$->attribute_name = "UNKNOWN";
         $$->aggregation_name = "mulattrs";
+        $$->ValidAgg = 0;
       }
+    }
+    | ID LBRACE RBRACE {
+      $$ = new RelAttrSqlNode(0);
     }
     ;
 

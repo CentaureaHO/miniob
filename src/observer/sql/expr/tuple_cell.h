@@ -17,19 +17,22 @@ See the Mulan PSL v2 for more details. */
 #include <iostream>
 #include "storage/table/table.h"
 #include "storage/field/field_meta.h"
+#include "sql/parser/aggregation_parser.h"
 
 class TupleCellSpec
 {
   public:
-    TupleCellSpec(const char* table_name, const char* field_name, const char* alias = nullptr);
-    TupleCellSpec(const char* alias);
+    TupleCellSpec(const char* table_name, const char* field_name, const char* alias = nullptr, AggregationType agg_type = AggregationType::NOTAGG);
+    TupleCellSpec(const char* alias, AggregationType agg_type = AggregationType::NOTAGG);
 
     const char* table_name() const { return table_name_.c_str(); }
     const char* field_name() const { return field_name_.c_str(); }
     const char* alias() const { return alias_.c_str(); }
+    const char* agg() const { return agg_.c_str(); }
 
   private:
     std::string table_name_;
     std::string field_name_;
     std::string alias_;
+    std::string agg_;
 };

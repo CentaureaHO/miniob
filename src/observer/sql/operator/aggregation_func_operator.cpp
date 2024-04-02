@@ -6,40 +6,16 @@
 #include <string>
 #include <vector>
 
-const char* AGGREGATION_TYPE_NAME[] = {
-    "not_func",
-    "avg",
-    "count",
-    "max",
-    "min",
-    "sum",
-    "mulattrs",
-    "unknown",
-};
-
-const char* aggregation_type_to_string(AggregationType type)
-{
-    if (type > NOTAGG && type < UNKNOWN) return AGGREGATION_TYPE_NAME[type];
-    return AGGREGATION_TYPE_NAME[UNKNOWN];
-}
-
-AggregationType aggregation_type_from_string(const char* s)
-{
-    for (unsigned int i = NOTAGG + 1; i < UNKNOWN; i++)
-        if (strcmp(s, AGGREGATION_TYPE_NAME[i]) == 0) return (AggregationType)i;
-    return UNKNOWN;
-}
-
 RC AggregationOperator::init(const std::string& func_name)
 {
     func_name_ = func_name;
     func_type_ = aggregation_type_from_string(func_name.c_str());
-    if (func_type_ == UNKNOWN)
+    if (func_type_ == AggregationType::UNKNOWN)
     {
         LOG_INFO("Unknown aggregation function: %s", func_name.c_str());
         return RC::UNKNOWN_AGGREGATION_FUNC;
     }
-    else if (func_type_ == MULATTRS)
+    else if (func_type_ == AggregationType::MULATTRS)
     {
         LOG_INFO("Aggregation function %s can't be applied to multiple attributes", func_name.c_str());
         return RC::AGGREGATION_UNMATCHED;
@@ -47,36 +23,36 @@ RC AggregationOperator::init(const std::string& func_name)
     return RC::SUCCESS;
 }
 
-RC AggregationOperator::run(std::vector<Value>& values, const char* field_name)
+RC AggregationOperator::init(AggregationType type)
 {
-    // 检查UNKNOWN, MULATTRS与*
-    if (func_type_ == UNKNOWN)
+    func_type_ = type;
+    if (func_type_ == AggregationType::UNKNOWN)
     {
-        LOG_INFO("Unknown aggregation function: %s", func_name_.c_str());
+        LOG_INFO("Unknown aggregation function");
         return RC::UNKNOWN_AGGREGATION_FUNC;
     }
-    else if (func_type_ == MULATTRS)
+    else if (func_type_ == AggregationType::MULATTRS)
     {
-        LOG_INFO("Aggregation function %s can't be applied to multiple attributes", func_name_.c_str());
+        LOG_INFO("Aggregation function can't be applied to multiple attributes");
         return RC::AGGREGATION_UNMATCHED;
     }
-    else if (0 == strcmp(field_name, "*") && func_type_ != F_COUNT)
-    {
-        LOG_INFO("Aggregation function %s can't be applied to *", func_name_.c_str());
-        return RC::AGGREGATION_UNMATCHED;
-    }
+    return RC::SUCCESS;
+}
 
-    if (values.empty())
+RC AggregationOperator::run(std::vector<Value>& values, const char* field_name) 
+{
+    if (values.empty()) 
     {
-        LOG_INFO("No values to aggregate in %s", field_name);
+        LOG_INFO("No values to aggregate for field %s", field_name);
         return RC::EMPTY;
     }
 
-    switch (func_type_)
+    switch (func_type_) 
     {
         case F_AVG:
             return Run_AVG(values);
         case F_COUNT:
+        case F_COUNT_ALL:
             return Run_COUNT(values);
         case F_MAX:
             return Run_MAX(values);
@@ -85,10 +61,9 @@ RC AggregationOperator::run(std::vector<Value>& values, const char* field_name)
         case F_SUM:
             return Run_SUM(values);
         default:
+            LOG_INFO("Unsupported aggregation function: %s", func_name_.c_str());
             return RC::AGGREGATION_UNMATCHED;
     }
-
-    return RC::AGGREGATION_UNMATCHED;
 }
 
 RC AggregationOperator::Run_AVG(std::vector<Value>& values) const
@@ -112,7 +87,7 @@ RC AggregationOperator::Run_AVG(std::vector<Value>& values) const
     return RC::SUCCESS;
 }
 
-RC AggregationOperator::Run_COUNT(std::vector<Value>& values) const
+RC AggregationOperator::Run_COUNT(std::vector<Value>& values) const 
 {
     values[0].set_int(values.size());
     values.erase(values.begin() + 1, values.end());
