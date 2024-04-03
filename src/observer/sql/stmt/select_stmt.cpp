@@ -82,18 +82,25 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
     for (int i = static_cast<int>(select_sql.attributes.size()) - 1; i >= 0; i--)
     {
         const RelAttrSqlNode& relation_attr = select_sql.attributes[i];
-        if (!relation_attr.ValidAgg) { return RC::INVALID_ARGUMENT; }
         AggregationType aggr_type = relation_attr.aggr_type();
-        if (aggr_type != AggregationType::NOTAGG) 
+        if (!relation_attr.ValidAgg)
         {
             if (aggr_type == AggregationType::COMPOSITE)
             {
                 LOG_WARN("Nested aggregation functions are not allowed.");
                 return RC::NESTED_AGGREGATION;
-            } 
-            IsAgg = 1;
+            }
+            else if (aggr_type == AggregationType::MULATTRS)
+            {
+                LOG_WARN("Multiple attributes are not allowed in aggregation functions.");
+                return RC::AGGREGATION_UNMATCHED;
+            }
+            return RC::INVALID_ARGUMENT;
         }
-        else { IsCommon = 1; }
+        if (aggr_type != AggregationType::NOTAGG)
+            IsAgg = 1;
+        else
+            IsCommon = 1;
         if (IsAgg && IsCommon)
         {
             LOG_WARN("Aggregate functions and attributes cannot be queried simultaneously.");
