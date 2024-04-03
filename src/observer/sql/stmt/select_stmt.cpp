@@ -88,6 +88,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
         {
             if (aggr_type != AggregationType::F_COUNT_ALL && aggr_type != AggregationType::NOTAGG)
             {
+                LOG_WARN("Invalid aggregation type for field \'*\'. aggr: %s", aggregation_type_to_string(aggr_type));
                 return RC::INVALID_ARGUMENT;
             }
             for (Table* table : tables) { wildcard_fields(table, query_fields, aggr_type); }

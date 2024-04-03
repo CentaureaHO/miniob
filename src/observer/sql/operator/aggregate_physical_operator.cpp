@@ -26,17 +26,12 @@ RC AggregationPhysicalOperator::open(Trx* trx)
 RC AggregationPhysicalOperator::next()
 {
     if (children_.empty()) return RC::SUCCESS;
-
     PhysicalOperator* oper = children_[0].get();
     if (!oper) return RC::INTERNAL;
-
     if (result_tuple_.cell_num() > 0) return RC::RECORD_EOF;
-
     std::vector<AggregationOperator> aggregationOps(aggs_.size());
     std::vector<std::vector<Value>>  aggregatedValues(aggs_.size());
-
     for (size_t i = 0; i < aggs_.size(); ++i) aggregationOps[i].init(aggs_[i]);
-
     RC rc = RC::SUCCESS;
     while ((rc = oper->next()) == RC::SUCCESS)
     {
@@ -55,15 +50,12 @@ RC AggregationPhysicalOperator::next()
     std::vector<Value> resultCells(aggs_.size(), Value());
     for (size_t i = 0; i < aggs_.size(); ++i)
     {
-        if (aggs_[i] != NOTAGG)
+        if (aggregationOps[i].run(aggregatedValues[i], "") != RC::SUCCESS)
         {
-            if (aggregationOps[i].run(aggregatedValues[i], "") != RC::SUCCESS)
-            {
-                LOG_WARN("failed to run aggregation operator: %s", strrc(rc));
-                return rc;
-            }
-            if (!aggregatedValues[i].empty()) resultCells[i] = aggregatedValues[i][0];
+            LOG_WARN("failed to run aggregation operator: %s", strrc(rc));
+            return rc;
         }
+        if (!aggregatedValues[i].empty()) resultCells[i] = aggregatedValues[i][0];
     }
 
     if (rc == RC::RECORD_EOF || aggs_.empty())

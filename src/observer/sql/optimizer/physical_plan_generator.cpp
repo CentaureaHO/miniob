@@ -369,7 +369,7 @@ RC PhysicalPlanGenerator::create_plan(
 
     AggregationPhysicalOperator* aggregate_operator = new AggregationPhysicalOperator;
     const vector<Field>&         fields             = aggregate_oper.fields();
-    for (const auto& field : fields) aggregate_operator->add_aggregation(field.func());
+    for (const auto& field : fields) { aggregate_operator->add_aggregation(field.func()); }
 
     if (child_phy_oper) aggregate_operator->add_child(std::move(child_phy_oper));
     oper = unique_ptr<PhysicalOperator>(aggregate_operator);

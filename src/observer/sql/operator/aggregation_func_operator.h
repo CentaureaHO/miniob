@@ -35,4 +35,6 @@ class AggregationOperator
     RC Run_MAX(std::vector<Value>& values) const;
     RC Run_MIN(std::vector<Value>& values) const;
     RC Run_SUM(std::vector<Value>& values) const;
+
+    RC Run_NOTAGG(std::vector<Value>& values) const;
 };
