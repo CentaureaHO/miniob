@@ -12,6 +12,7 @@ enum AggregationType
     F_MIN,
     F_SUM,
     MULATTRS,
+    COMPOSITE,
     UNKNOWN,
 };
 

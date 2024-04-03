@@ -84,7 +84,15 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
         const RelAttrSqlNode& relation_attr = select_sql.attributes[i];
         if (!relation_attr.ValidAgg) { return RC::INVALID_ARGUMENT; }
         AggregationType aggr_type = relation_attr.aggr_type();
-        if (aggr_type != AggregationType::NOTAGG) { IsAgg = 1; }
+        if (aggr_type != AggregationType::NOTAGG) 
+        {
+            if (aggr_type == AggregationType::COMPOSITE)
+            {
+                LOG_WARN("Nested aggregation functions are not allowed.");
+                return RC::NESTED_AGGREGATION;
+            } 
+            IsAgg = 1;
+        }
         else { IsCommon = 1; }
         if (IsAgg && IsCommon)
         {

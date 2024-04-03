@@ -9,6 +9,7 @@ const char* AGGREGATION_TYPE_NAME[] = {
     "min",
     "sum",
     "mulattrs",
+    "composite",
     "unknown",
 };
 

@@ -518,8 +518,6 @@ rel_attr:
       $$ = new RelAttrSqlNode;
       $$->attribute_name = "*";
     }
-
-    // Single table query
     | ID {
       $$ = new RelAttrSqlNode;
       $$->attribute_name = $1;
@@ -527,23 +525,22 @@ rel_attr:
     }
     | ID LBRACE rel_attr attr_list RBRACE {
       $$ = $3;
-      if ($4 == nullptr)
-      {
-        $$->aggregation_name = $1;
+      if ($4 == nullptr) {
+        if ($$->aggregation_name != "not_func") {
+          $$->aggregation_name = "composite";
+        } else {
+          $$->aggregation_name = $1;
+        }
         free($1);
-      }
-      else
-      {
+      } else {
         $$->attribute_name = "UNKNOWN";
-        $$->aggregation_name = "mulattrs";
+        $$->aggregation_name = "composite";
         $$->ValidAgg = 0;
       }
     }
     | ID LBRACE RBRACE {
       $$ = new RelAttrSqlNode(0);
     }
-
-    // Multi table query
     | ID DOT ID {
       $$ = new RelAttrSqlNode;
       $$->relation_name  = $1;
@@ -554,15 +551,16 @@ rel_attr:
     | ID DOT ID LBRACE rel_attr attr_list RBRACE {
       $$ = $5;
       $$->relation_name  = $1;
-      if ($6 == nullptr)
-      {
-        $$->aggregation_name = $3;
+      if ($6 == nullptr) {
+        if ($$->aggregation_name != "not_func") {
+          $$->aggregation_name = "composite";
+        } else {
+          $$->aggregation_name = $3;
+        }
         free($3);
-      }
-      else
-      {
+      } else {
         $$->attribute_name = "UNKNOWN";
-        $$->aggregation_name = "mulattrs";
+        $$->aggregation_name = "composite"; // Similarly, set to "composite" for complex cases
         $$->ValidAgg = 0;
       }
       free($1);

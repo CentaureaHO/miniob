@@ -41,8 +41,9 @@ struct RelAttrSqlNode
     std::string attribute_name;    ///< attribute name              属性名
     std::string aggregation_name;  ///< aggregation type
     bool        ValidAgg;          ///< is agg valid or not
+    bool        IsAggResult;       ///< is this node an aggregation result
 
-    RelAttrSqlNode(bool valid = 1) : aggregation_name("not_func"), ValidAgg(valid) {}
+    RelAttrSqlNode(bool valid = 1) : aggregation_name("not_func"), ValidAgg(valid), IsAggResult(false) {}
 
     AggregationType aggr_type() const
     {
