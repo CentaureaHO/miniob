@@ -144,15 +144,7 @@ RC LogicalPlanGenerator::create_plan(SelectStmt* select_stmt, unique_ptr<Logical
         if (table_oper) { project_oper->add_child(std::move(table_oper)); }
     }
 
-    bool AggFlag = 0;
-    for (const Field& field : all_fields)
-        if (field.func() != AggregationType::NOTAGG)
-        {
-            AggFlag = 1;
-            break;
-        }
-
-    if (AggFlag)
+    if (select_stmt->is_agg())
     {
         unique_ptr<LogicalOperator> aggregation_oper(new AggregationLogicalOperator(all_fields));
         aggregation_oper->add_child(std::move(project_oper));
