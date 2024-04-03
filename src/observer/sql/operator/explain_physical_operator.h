@@ -23,7 +23,7 @@ See the Mulan PSL v2 for more details. */
 class ExplainPhysicalOperator : public PhysicalOperator
 {
   public:
-    ExplainPhysicalOperator() = default;
+    ExplainPhysicalOperator()          = default;
     virtual ~ExplainPhysicalOperator() = default;
 
     PhysicalOperatorType type() const override { return PhysicalOperatorType::EXPLAIN; }

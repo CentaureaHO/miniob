@@ -43,9 +43,9 @@ Stage* Server::session_stage_ = nullptr;
 
 ServerParam::ServerParam()
 {
-    listen_addr = INADDR_ANY;
+    listen_addr        = INADDR_ANY;
     max_connection_num = MAX_CONNECTION_NUM_DEFAULT;
-    port = PORT_DEFAULT;
+    port               = PORT_DEFAULT;
 }
 
 Server::Server(ServerParam input_server_param) : server_param_(input_server_param) {}
@@ -87,7 +87,7 @@ void Server::recv(int fd, short ev, void* arg)
     Communicator* comm = (Communicator*)arg;
 
     SessionEvent* event = nullptr;
-    RC            rc = comm->read_event(event);
+    RC            rc    = comm->read_event(event);
     if (rc != RC::SUCCESS)
     {
         close_connection(comm);
@@ -140,7 +140,7 @@ void Server::accept(int fd, short ev, void* arg)
     {
         // unix socket不支持设置NODELAY
         int yes = 1;
-        ret = setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
+        ret     = setsockopt(client_fd, IPPROTO_TCP, TCP_NODELAY, &yes, sizeof(yes));
         if (ret < 0)
         {
             LOG_ERROR("Failed to set socket of %s option as : TCP_NODELAY %s\n", addr_str.c_str(), strerror(errno));
@@ -150,7 +150,7 @@ void Server::accept(int fd, short ev, void* arg)
     }
 
     Communicator* communicator = instance->communicator_factory_.create(instance->server_param_.protocol);
-    RC            rc = communicator->init(client_fd, new Session(Session::default_session()), addr_str);
+    RC            rc           = communicator->init(client_fd, new Session(Session::default_session()), addr_str);
     if (rc != RC::SUCCESS)
     {
         LOG_WARN("failed to init communicator. rc=%s", strrc(rc));
@@ -200,7 +200,7 @@ int Server::start_tcp_server()
     }
 
     int yes = 1;
-    ret = setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
+    ret     = setsockopt(server_socket_, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes));
     if (ret < 0)
     {
         LOG_ERROR("Failed to set socket option of reuse address: %s.", strerror(errno));
@@ -217,8 +217,8 @@ int Server::start_tcp_server()
     }
 
     memset(&sa, 0, sizeof(sa));
-    sa.sin_family = AF_INET;
-    sa.sin_port = htons(server_param_.port);
+    sa.sin_family      = AF_INET;
+    sa.sin_port        = htons(server_param_.port);
     sa.sin_addr.s_addr = htonl(server_param_.listen_addr);
 
     ret = ::bind(server_socket_, (struct sockaddr*)&sa, sizeof(sa));
@@ -261,7 +261,7 @@ int Server::start_tcp_server()
 
 int Server::start_unix_socket_server()
 {
-    int ret = 0;
+    int ret        = 0;
     server_socket_ = socket(PF_UNIX, SOCK_STREAM, 0);
     if (server_socket_ < 0)
     {
@@ -325,7 +325,7 @@ int Server::start_unix_socket_server()
 int Server::start_stdin_server()
 {
     Communicator* communicator = communicator_factory_.create(server_param_.protocol);
-    RC            rc = communicator->init(STDIN_FILENO, new Session(Session::default_session()), "stdin");
+    RC            rc           = communicator->init(STDIN_FILENO, new Session(Session::default_session()), "stdin");
     if (OB_FAIL(rc))
     {
         LOG_WARN("failed to init cli communicator. rc=%s", strrc(rc));
@@ -337,7 +337,7 @@ int Server::start_stdin_server()
     while (started_)
     {
         SessionEvent* event = nullptr;
-        rc = communicator->read_event(event);
+        rc                  = communicator->read_event(event);
         if (OB_FAIL(rc))
         {
             LOG_WARN("failed to read event. rc=%s", strrc(rc));

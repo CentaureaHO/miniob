@@ -100,9 +100,9 @@ class Record
 
     Record(const Record& other)
     {
-        rid_ = other.rid_;
-        data_ = other.data_;
-        len_ = other.len_;
+        rid_   = other.rid_;
+        data_  = other.data_;
+        len_   = other.len_;
         owner_ = other.owner_;
 
         if (other.owner_)
@@ -126,15 +126,15 @@ class Record
     void set_data(char* data, int len = 0)
     {
         this->data_ = data;
-        this->len_ = len;
+        this->len_  = len;
     }
     void set_data_owner(char* data, int len)
     {
         ASSERT(len != 0, "the len of data should not be 0");
         this->~Record();
 
-        this->data_ = data;
-        this->len_ = len;
+        this->data_  = data;
+        this->len_   = len;
         this->owner_ = true;
     }
 
@@ -154,7 +154,7 @@ class Record
   private:
     RID rid_;
 
-    char* data_ = nullptr;
-    int   len_ = 0;        /// 如果不是record自己来管理内存，这个字段可能是无效的
+    char* data_  = nullptr;
+    int   len_   = 0;      /// 如果不是record自己来管理内存，这个字段可能是无效的
     bool  owner_ = false;  /// 表示当前是否由record来管理内存
 };

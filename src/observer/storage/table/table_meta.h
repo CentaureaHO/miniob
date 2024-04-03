@@ -29,7 +29,7 @@ See the Mulan PSL v2 for more details. */
 class TableMeta : public common::Serializable
 {
   public:
-    TableMeta() = default;
+    TableMeta()  = default;
     ~TableMeta() = default;
 
     TableMeta(const TableMeta& other);

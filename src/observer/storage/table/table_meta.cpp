@@ -33,8 +33,7 @@ TableMeta::TableMeta(const TableMeta& other)
       fields_(other.fields_),
       indexes_(other.indexes_),
       record_size_(other.record_size_)
-{
-}
+{}
 
 void TableMeta::swap(TableMeta& other) noexcept
 {
@@ -60,9 +59,9 @@ RC TableMeta::init(int32_t table_id, const char* name, int field_num, const Attr
 
     RC rc = RC::SUCCESS;
 
-    int                      field_offset = 0;
+    int                      field_offset  = 0;
     int                      trx_field_num = 0;
-    const vector<FieldMeta>* trx_fields = TrxKit::instance()->trx_fields();
+    const vector<FieldMeta>* trx_fields    = TrxKit::instance()->trx_fields();
     if (trx_fields != nullptr)
     {
         fields_.resize(field_num + trx_fields->size());
@@ -82,7 +81,7 @@ RC TableMeta::init(int32_t table_id, const char* name, int field_num, const Attr
     for (int i = 0; i < field_num; i++)
     {
         const AttrInfoSqlNode& attr_info = attributes[i];
-        rc = fields_[i + trx_field_num].init(
+        rc                               = fields_[i + trx_field_num].init(
             attr_info.name.c_str(), attr_info.type, field_offset, attr_info.length, true /*visible*/);
         if (rc != RC::SUCCESS)
         {
@@ -96,7 +95,7 @@ RC TableMeta::init(int32_t table_id, const char* name, int field_num, const Attr
     record_size_ = field_offset;
 
     table_id_ = table_id;
-    name_ = name;
+    name_     = name;
     LOG_INFO("Sussessfully initialized table meta. table id=%d, name=%s", table_id, name);
     return RC::SUCCESS;
 }
@@ -172,7 +171,7 @@ int TableMeta::serialize(std::ostream& ss) const
 {
 
     Json::Value table_value;
-    table_value[FIELD_TABLE_ID] = table_id_;
+    table_value[FIELD_TABLE_ID]   = table_id_;
     table_value[FIELD_TABLE_NAME] = name_;
 
     Json::Value fields_value;
@@ -243,7 +242,7 @@ int TableMeta::deserialize(std::istream& is)
         return -1;
     }
 
-    RC                     rc = RC::SUCCESS;
+    RC                     rc        = RC::SUCCESS;
     int                    field_num = fields_value.size();
     std::vector<FieldMeta> fields(field_num);
     for (int i = 0; i < field_num; i++)
@@ -251,7 +250,7 @@ int TableMeta::deserialize(std::istream& is)
         FieldMeta& field = fields[i];
 
         const Json::Value& field_value = fields_value[i];
-        rc = FieldMeta::from_json(field_value, field);
+        rc                             = FieldMeta::from_json(field_value, field);
         if (rc != RC::SUCCESS)
         {
             LOG_ERROR("Failed to deserialize table meta. table name =%s", table_name.c_str());
@@ -282,7 +281,7 @@ int TableMeta::deserialize(std::istream& is)
             IndexMeta& index = indexes[i];
 
             const Json::Value& index_value = indexes_value[i];
-            rc = IndexMeta::from_json(*this, index_value, index);
+            rc                             = IndexMeta::from_json(*this, index_value, index);
             if (rc != RC::SUCCESS)
             {
                 LOG_ERROR("Failed to deserialize table meta. table name=%s", table_name.c_str());

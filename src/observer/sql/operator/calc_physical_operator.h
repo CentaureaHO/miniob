@@ -22,8 +22,7 @@ class CalcPhysicalOperator : public PhysicalOperator
   public:
     CalcPhysicalOperator(std::vector<std::unique_ptr<Expression>>&& expressions)
         : expressions_(std::move(expressions)), tuple_(expressions_)
-    {
-    }
+    {}
 
     virtual ~CalcPhysicalOperator() = default;
 

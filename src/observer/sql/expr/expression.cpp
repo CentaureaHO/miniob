@@ -30,8 +30,7 @@ RC ValueExpr::get_value(const Tuple& tuple, Value& value) const
 
 /////////////////////////////////////////////////////////////////////////////////
 CastExpr::CastExpr(unique_ptr<Expression> child, AttrType cast_type) : child_(std::move(child)), cast_type_(cast_type)
-{
-}
+{}
 
 CastExpr::~CastExpr() {}
 
@@ -46,12 +45,14 @@ RC CastExpr::cast(const Value& value, Value& cast_value) const
 
     switch (cast_type_)
     {
-        case BOOLEANS: {
+        case BOOLEANS:
+        {
             bool val = value.get_boolean();
             cast_value.set_boolean(val);
         }
         break;
-        default: {
+        default:
+        {
             rc = RC::INTERNAL;
             LOG_WARN("unsupported convert from type %d to %d", child_->value_type(), cast_type_);
         }
@@ -79,43 +80,49 @@ RC CastExpr::try_get_value(Value& value) const
 
 ComparisonExpr::ComparisonExpr(CompOp comp, unique_ptr<Expression> left, unique_ptr<Expression> right)
     : comp_(comp), left_(std::move(left)), right_(std::move(right))
-{
-}
+{}
 
 ComparisonExpr::~ComparisonExpr() {}
 
 RC ComparisonExpr::compare_value(const Value& left, const Value& right, bool& result) const
 {
-    RC  rc = RC::SUCCESS;
+    RC  rc         = RC::SUCCESS;
     int cmp_result = left.compare(right);
-    result = false;
+    result         = false;
     switch (comp_)
     {
-        case EQUAL_TO: {
+        case EQUAL_TO:
+        {
             result = (0 == cmp_result);
         }
         break;
-        case LESS_EQUAL: {
+        case LESS_EQUAL:
+        {
             result = (cmp_result <= 0);
         }
         break;
-        case NOT_EQUAL: {
+        case NOT_EQUAL:
+        {
             result = (cmp_result != 0);
         }
         break;
-        case LESS_THAN: {
+        case LESS_THAN:
+        {
             result = (cmp_result < 0);
         }
         break;
-        case GREAT_EQUAL: {
+        case GREAT_EQUAL:
+        {
             result = (cmp_result >= 0);
         }
         break;
-        case GREAT_THAN: {
+        case GREAT_THAN:
+        {
             result = (cmp_result > 0);
         }
         break;
-        default: {
+        default:
+        {
             LOG_WARN("unsupported comparison. %d", comp_);
             rc = RC::INTERNAL;
         }
@@ -129,13 +136,13 @@ RC ComparisonExpr::try_get_value(Value& cell) const
 {
     if (left_->type() == ExprType::VALUE && right_->type() == ExprType::VALUE)
     {
-        ValueExpr*   left_value_expr = static_cast<ValueExpr*>(left_.get());
+        ValueExpr*   left_value_expr  = static_cast<ValueExpr*>(left_.get());
         ValueExpr*   right_value_expr = static_cast<ValueExpr*>(right_.get());
-        const Value& left_cell = left_value_expr->get_value();
-        const Value& right_cell = right_value_expr->get_value();
+        const Value& left_cell        = left_value_expr->get_value();
+        const Value& right_cell       = right_value_expr->get_value();
 
         bool value = false;
-        RC   rc = compare_value(left_cell, right_cell, value);
+        RC   rc    = compare_value(left_cell, right_cell, value);
         if (rc != RC::SUCCESS) { LOG_WARN("failed to compare tuple cells. rc=%s", strrc(rc)); }
         else { cell.set_boolean(value); }
         return rc;
@@ -163,7 +170,7 @@ RC ComparisonExpr::get_value(const Tuple& tuple, Value& value) const
     }
 
     bool bool_value = false;
-    rc = compare_value(left_value, right_value, bool_value);
+    rc              = compare_value(left_value, right_value, bool_value);
     if (rc == RC::SUCCESS) { value.set_boolean(bool_value); }
     return rc;
 }
@@ -171,8 +178,7 @@ RC ComparisonExpr::get_value(const Tuple& tuple, Value& value) const
 ////////////////////////////////////////////////////////////////////////////////
 ConjunctionExpr::ConjunctionExpr(Type type, vector<unique_ptr<Expression>>& children)
     : conjunction_type_(type), children_(std::move(children))
-{
-}
+{}
 
 RC ConjunctionExpr::get_value(const Tuple& tuple, Value& value) const
 {
@@ -209,12 +215,10 @@ RC ConjunctionExpr::get_value(const Tuple& tuple, Value& value) const
 
 ArithmeticExpr::ArithmeticExpr(ArithmeticExpr::Type type, Expression* left, Expression* right)
     : arithmetic_type_(type), left_(left), right_(right)
-{
-}
+{}
 ArithmeticExpr::ArithmeticExpr(ArithmeticExpr::Type type, unique_ptr<Expression> left, unique_ptr<Expression> right)
     : arithmetic_type_(type), left_(std::move(left)), right_(std::move(right))
-{
-}
+{}
 
 AttrType ArithmeticExpr::value_type() const
 {
@@ -237,25 +241,29 @@ RC ArithmeticExpr::calc_value(const Value& left_value, const Value& right_value,
 
     switch (arithmetic_type_)
     {
-        case Type::ADD: {
+        case Type::ADD:
+        {
             if (target_type == AttrType::INTS) { value.set_int(left_value.get_int() + right_value.get_int()); }
             else { value.set_float(left_value.get_float() + right_value.get_float()); }
         }
         break;
 
-        case Type::SUB: {
+        case Type::SUB:
+        {
             if (target_type == AttrType::INTS) { value.set_int(left_value.get_int() - right_value.get_int()); }
             else { value.set_float(left_value.get_float() - right_value.get_float()); }
         }
         break;
 
-        case Type::MUL: {
+        case Type::MUL:
+        {
             if (target_type == AttrType::INTS) { value.set_int(left_value.get_int() * right_value.get_int()); }
             else { value.set_float(left_value.get_float() * right_value.get_float()); }
         }
         break;
 
-        case Type::DIV: {
+        case Type::DIV:
+        {
             if (target_type == AttrType::INTS)
             {
                 if (right_value.get_int() == 0)
@@ -279,13 +287,15 @@ RC ArithmeticExpr::calc_value(const Value& left_value, const Value& right_value,
         }
         break;
 
-        case Type::NEGATIVE: {
+        case Type::NEGATIVE:
+        {
             if (target_type == AttrType::INTS) { value.set_int(-left_value.get_int()); }
             else { value.set_float(-left_value.get_float()); }
         }
         break;
 
-        default: {
+        default:
+        {
             rc = RC::INTERNAL;
             LOG_WARN("unsupported arithmetic type. %d", arithmetic_type_);
         }

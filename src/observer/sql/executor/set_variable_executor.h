@@ -29,21 +29,21 @@ See the Mulan PSL v2 for more details. */
 class SetVariableExecutor
 {
   public:
-    SetVariableExecutor() = default;
+    SetVariableExecutor()          = default;
     virtual ~SetVariableExecutor() = default;
 
     RC execute(SQLStageEvent* sql_event)
     {
-        RC               rc = RC::SUCCESS;
+        RC               rc      = RC::SUCCESS;
         Session*         session = sql_event->session_event()->session();
-        SetVariableStmt* stmt = (SetVariableStmt*)sql_event->stmt();
+        SetVariableStmt* stmt    = (SetVariableStmt*)sql_event->stmt();
 
-        const char*  var_name = stmt->var_name();
+        const char*  var_name  = stmt->var_name();
         const Value& var_value = stmt->var_value();
         if (strcasecmp(var_name, "sql_debug") == 0)
         {
             bool bool_value = false;
-            rc = var_value_to_boolean(var_value, bool_value);
+            rc              = var_value_to_boolean(var_value, bool_value);
             if (rc != RC::SUCCESS) { return rc; }
 
             session->set_sql_debug(bool_value);

@@ -39,6 +39,6 @@ class DeleteStmt : public Stmt
     static RC create(Db* db, const DeleteSqlNode& delete_sql, Stmt*& stmt);
 
   private:
-    Table*      table_ = nullptr;
+    Table*      table_       = nullptr;
     FilterStmt* filter_stmt_ = nullptr;
 };

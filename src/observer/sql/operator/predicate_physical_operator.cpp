@@ -36,7 +36,7 @@ RC PredicatePhysicalOperator::open(Trx* trx)
 
 RC PredicatePhysicalOperator::next()
 {
-    RC                rc = RC::SUCCESS;
+    RC                rc   = RC::SUCCESS;
     PhysicalOperator* oper = children_.front().get();
 
     while (RC::SUCCESS == (rc = oper->next()))

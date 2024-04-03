@@ -33,7 +33,7 @@ using namespace common;
 
 RC ExecuteStage::handle_request(SQLStageEvent* sql_event)
 {
-    RC                                  rc = RC::SUCCESS;
+    RC                                  rc                = RC::SUCCESS;
     const unique_ptr<PhysicalOperator>& physical_operator = sql_event->physical_operator();
     if (physical_operator != nullptr) { return handle_request_with_physical_operator(sql_event); }
 
@@ -52,7 +52,7 @@ RC ExecuteStage::handle_request(SQLStageEvent* sql_event)
 
 RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
 {
-    RC rc = RC::SUCCESS;
+    RC    rc   = RC::SUCCESS;
     Stmt* stmt = sql_event->stmt();
     ASSERT(stmt != nullptr, "SQL Statement shouldn't be empty!");
 
@@ -63,8 +63,9 @@ RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
     TupleSchema schema;
     switch (stmt->type())
     {
-        case StmtType::SELECT: {
-            SelectStmt* select_stmt = static_cast<SelectStmt*>(stmt);
+        case StmtType::SELECT:
+        {
+            SelectStmt* select_stmt     = static_cast<SelectStmt*>(stmt);
             bool        with_table_name = select_stmt->tables().size() > 1;
 
             for (const Field& field : select_stmt->query_fields())
@@ -76,7 +77,8 @@ RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
         }
         break;
 
-        case StmtType::CALC: {
+        case StmtType::CALC:
+        {
             CalcPhysicalOperator* calc_operator = static_cast<CalcPhysicalOperator*>(physical_operator.get());
             for (const unique_ptr<Expression>& expr : calc_operator->expressions())
             {
@@ -85,11 +87,13 @@ RC ExecuteStage::handle_request_with_physical_operator(SQLStageEvent* sql_event)
         }
         break;
 
-        case StmtType::EXPLAIN: {
+        case StmtType::EXPLAIN:
+        {
             schema.append_cell("Query Plan");
         }
         break;
-        default: {
+        default:
+        {
             // 只有select返回结果
         }
         break;

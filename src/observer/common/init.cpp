@@ -41,7 +41,7 @@ using namespace common;
 
 bool*& _get_init()
 {
-    static bool  util_init = false;
+    static bool  util_init   = false;
     static bool* util_init_p = &util_init;
     return util_init_p;
 }
@@ -75,13 +75,13 @@ int init_log(ProcessParam* process_cfg, Ini& properties)
         auto log_context_getter = []() { return reinterpret_cast<intptr_t>(Session::current_session()); };
 
         const std::string                  log_section_name = "LOG";
-        std::map<std::string, std::string> log_section = properties.get(log_section_name);
+        std::map<std::string, std::string> log_section      = properties.get(log_section_name);
 
         std::string log_file_name;
 
         // get log file name
         std::string                                  key = "LOG_FILE_NAME";
-        std::map<std::string, std::string>::iterator it = log_section.find(key);
+        std::map<std::string, std::string>::iterator it  = log_section.find(key);
         if (it == log_section.end())
         {
             log_file_name = proc_name + ".log";
@@ -92,8 +92,8 @@ int init_log(ProcessParam* process_cfg, Ini& properties)
         log_file_name = getAboslutPath(log_file_name.c_str());
 
         LOG_LEVEL log_level = LOG_LEVEL_INFO;
-        key = ("LOG_FILE_LEVEL");
-        it = log_section.find(key);
+        key                 = ("LOG_FILE_LEVEL");
+        it                  = log_section.find(key);
         if (it != log_section.end())
         {
             int log = (int)log_level;
@@ -102,8 +102,8 @@ int init_log(ProcessParam* process_cfg, Ini& properties)
         }
 
         LOG_LEVEL console_level = LOG_LEVEL_INFO;
-        key = ("LOG_CONSOLE_LEVEL");
-        it = log_section.find(key);
+        key                     = ("LOG_CONSOLE_LEVEL");
+        it                      = log_section.find(key);
         if (it != log_section.end())
         {
             int log = (int)console_level;
@@ -115,14 +115,13 @@ int init_log(ProcessParam* process_cfg, Ini& properties)
         g_log->set_context_getter(log_context_getter);
 
         key = ("DefaultLogModules");
-        it = log_section.find(key);
+        it  = log_section.find(key);
         if (it != log_section.end()) { g_log->set_default_module(it->second); }
 
         if (process_cfg->is_demon()) { sys_log_redirect(log_file_name.c_str(), log_file_name.c_str()); }
 
         return 0;
-    }
-    catch (std::exception& e)
+    } catch (std::exception& e)
     {
         std::cerr << "Failed to init log for " << proc_name << SYS_OUTPUT_FILE_POS << SYS_OUTPUT_ERROR << std::endl;
         return errno;
@@ -158,7 +157,7 @@ int init_global_objects(ProcessParam* process_param, Ini& properties)
     DefaultHandler::set_default(GCTX.handler_);
 
     int ret = 0;
-    RC  rc = TrxKit::init_global(process_param->trx_kit_name().c_str());
+    RC  rc  = TrxKit::init_global(process_param->trx_kit_name().c_str());
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("failed to init trx kit. rc=%s", strrc(rc));

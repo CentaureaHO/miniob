@@ -27,7 +27,7 @@ class SqlResult;
 class LoadDataExecutor
 {
   public:
-    LoadDataExecutor() = default;
+    LoadDataExecutor()          = default;
     virtual ~LoadDataExecutor() = default;
 
     RC execute(SQLStageEvent* sql_event);

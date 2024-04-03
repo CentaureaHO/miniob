@@ -115,7 +115,7 @@ MvccTrx::MvccTrx(MvccTrxKit& kit, CLogManager* log_manager) : trx_kit_(kit), log
 
 MvccTrx::MvccTrx(MvccTrxKit& kit, int32_t trx_id) : trx_kit_(kit), trx_id_(trx_id)
 {
-    started_ = true;
+    started_    = true;
     recovering_ = true;
 }
 
@@ -226,7 +226,7 @@ RC MvccTrx::visit_record(Table* table, Record& record, bool readonly)
     trx_fields(table, begin_field, end_field);
 
     int32_t begin_xid = begin_field.get_int(record);
-    int32_t end_xid = end_field.get_int(record);
+    int32_t end_xid   = end_field.get_int(record);
 
     RC rc = RC::SUCCESS;
     if (begin_xid > 0 && end_xid > 0)
@@ -300,14 +300,15 @@ RC MvccTrx::commit()
 RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
 {
     // TODO 这里存在一个很大的问题，不能让其他事务一次性看到当前事务更新到的数据或同时看不到
-    RC rc = RC::SUCCESS;
+    RC rc    = RC::SUCCESS;
     started_ = false;
 
     for (const Operation& operation : operations_)
     {
         switch (operation.type())
         {
-            case Operation::Type::INSERT: {
+            case Operation::Type::INSERT:
+            {
                 RID    rid(operation.page_num(), operation.slot_num());
                 Table* table = operation.table();
                 Field  begin_xid_field, end_xid_field;
@@ -332,7 +333,8 @@ RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
             }
             break;
 
-            case Operation::Type::DELETE: {
+            case Operation::Type::DELETE:
+            {
                 Table* table = operation.table();
                 RID    rid(operation.page_num(), operation.slot_num());
 
@@ -357,7 +359,8 @@ RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
             }
             break;
 
-            default: {
+            default:
+            {
                 ASSERT(false, "unsupported operation. type=%d", static_cast<int>(operation.type()));
             }
         }
@@ -372,14 +375,15 @@ RC MvccTrx::commit_with_trx_id(int32_t commit_xid)
 
 RC MvccTrx::rollback()
 {
-    RC rc = RC::SUCCESS;
+    RC rc    = RC::SUCCESS;
     started_ = false;
 
     for (const Operation& operation : operations_)
     {
         switch (operation.type())
         {
-            case Operation::Type::INSERT: {
+            case Operation::Type::INSERT:
+            {
                 RID    rid(operation.page_num(), operation.slot_num());
                 Record record;
                 Table* table = operation.table();
@@ -400,7 +404,8 @@ RC MvccTrx::rollback()
             }
             break;
 
-            case Operation::Type::DELETE: {
+            case Operation::Type::DELETE:
+            {
                 Table* table = operation.table();
                 RID    rid(operation.page_num(), operation.slot_num());
 
@@ -428,7 +433,8 @@ RC MvccTrx::rollback()
             }
             break;
 
-            default: {
+            default:
+            {
                 ASSERT(false, "unsupported operation. type=%d", static_cast<int>(operation.type()));
             }
         }
@@ -446,9 +452,10 @@ RC find_table(Db* db, const CLogRecord& log_record, Table*& table)
     switch (clog_type_from_integer(log_record.header().type_))
     {
         case CLogType::INSERT:
-        case CLogType::DELETE: {
+        case CLogType::DELETE:
+        {
             const CLogRecordData& data_record = log_record.data_record();
-            table = db->find_table(data_record.table_id_);
+            table                             = db->find_table(data_record.table_id_);
             if (nullptr == table)
             {
                 LOG_WARN("no such table to redo. table id=%d, log record=%s",
@@ -457,7 +464,8 @@ RC find_table(Db* db, const CLogRecord& log_record, Table*& table)
             }
         }
         break;
-        default: {
+        default:
+        {
             // do nothing
         }
         break;
@@ -468,12 +476,13 @@ RC find_table(Db* db, const CLogRecord& log_record, Table*& table)
 RC MvccTrx::redo(Db* db, const CLogRecord& log_record)
 {
     Table* table = nullptr;
-    RC     rc = find_table(db, log_record, table);
+    RC     rc    = find_table(db, log_record, table);
     if (OB_FAIL(rc)) { return rc; }
 
     switch (log_record.log_type())
     {
-        case CLogType::INSERT: {
+        case CLogType::INSERT:
+        {
             const CLogRecordData& data_record = log_record.data_record();
             Record                record;
             record.set_data(const_cast<char*>(data_record.data_), data_record.data_len_);
@@ -489,7 +498,8 @@ RC MvccTrx::redo(Db* db, const CLogRecord& log_record)
         }
         break;
 
-        case CLogType::DELETE: {
+        case CLogType::DELETE:
+        {
             const CLogRecordData& data_record = log_record.data_record();
             Field                 begin_field;
             Field                 end_field;
@@ -515,18 +525,21 @@ RC MvccTrx::redo(Db* db, const CLogRecord& log_record)
         }
         break;
 
-        case CLogType::MTR_COMMIT: {
+        case CLogType::MTR_COMMIT:
+        {
             const CLogRecordCommitData& commit_record = log_record.commit_record();
             commit_with_trx_id(commit_record.commit_xid_);
         }
         break;
 
-        case CLogType::MTR_ROLLBACK: {
+        case CLogType::MTR_ROLLBACK:
+        {
             rollback();
         }
         break;
 
-        default: {
+        default:
+        {
             ASSERT(false, "unsupported redo log. log_record=%s", log_record.to_string().c_str());
             return RC::INTERNAL;
         }

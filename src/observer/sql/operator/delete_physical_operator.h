@@ -40,5 +40,5 @@ class DeletePhysicalOperator : public PhysicalOperator
 
   private:
     Table* table_ = nullptr;
-    Trx*   trx_ = nullptr;
+    Trx*   trx_   = nullptr;
 };

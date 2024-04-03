@@ -95,9 +95,9 @@ void SessionStage::handle_request(StageEvent* event)
     SQLStageEvent sql_event(sev, sql);
     (void)handle_sql(&sql_event);
 
-    Communicator* communicator = sev->get_communicator();
+    Communicator* communicator    = sev->get_communicator();
     bool          need_disconnect = false;
-    RC            rc = communicator->write_result(sev, need_disconnect);
+    RC            rc              = communicator->write_result(sev, need_disconnect);
     LOG_INFO("write result return %s", strrc(rc));
     if (need_disconnect) { Server::close_connection(communicator); }
     sev->session()->set_current_request(nullptr);
@@ -144,7 +144,7 @@ RC SessionStage::handle_sql(SQLStageEvent* sql_event)
         LOG_TRACE("failed to do optimize. rc=%s", strrc(rc));
         return rc;
     }
-    
+
     rc = execute_stage_.handle_request(sql_event);
     if (OB_FAIL(rc))
     {

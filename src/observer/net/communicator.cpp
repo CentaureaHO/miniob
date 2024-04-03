@@ -23,10 +23,10 @@ See the Mulan PSL v2 for more details. */
 
 RC Communicator::init(int fd, Session* session, const std::string& addr)
 {
-    fd_ = fd;
+    fd_      = fd;
     session_ = session;
-    addr_ = addr;
-    writer_ = new BufferedWriter(fd_);
+    addr_    = addr;
+    writer_  = new BufferedWriter(fd_);
     return RC::SUCCESS;
 }
 
@@ -56,19 +56,23 @@ Communicator* CommunicatorFactory::create(CommunicateProtocol protocol)
 {
     switch (protocol)
     {
-        case CommunicateProtocol::PLAIN: {
+        case CommunicateProtocol::PLAIN:
+        {
             return new PlainCommunicator;
         }
         break;
-        case CommunicateProtocol::CLI: {
+        case CommunicateProtocol::CLI:
+        {
             return new CliCommunicator;
         }
         break;
-        case CommunicateProtocol::MYSQL: {
+        case CommunicateProtocol::MYSQL:
+        {
             return new MysqlCommunicator;
         }
         break;
-        default: {
+        default:
+        {
             return nullptr;
         }
     }

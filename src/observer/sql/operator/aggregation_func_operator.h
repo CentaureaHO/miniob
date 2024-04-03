@@ -18,7 +18,7 @@
 class AggregationOperator
 {
   public:
-    AggregationOperator(): func_type_(NOTAGG) {}
+    AggregationOperator() : func_type_(NOTAGG) {}
 
     RC init(const std::string& func_name);
     RC init(AggregationType type);
@@ -28,7 +28,7 @@ class AggregationOperator
 
   private:
     AggregationType func_type_;
-    std::string func_name_;
+    std::string     func_name_;
 
     RC Run_AVG(std::vector<Value>& values) const;
     RC Run_COUNT(std::vector<Value>& values) const;

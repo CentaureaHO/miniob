@@ -48,7 +48,7 @@ Db* Session::get_current_db() const { return db_; }
 void Session::set_current_db(const std::string& dbname)
 {
     DefaultHandler& handler = DefaultHandler::get_default();
-    Db*             db = handler.find_db(dbname.c_str());
+    Db*             db      = handler.find_db(dbname.c_str());
     if (db == nullptr)
     {
         LOG_WARN("no such database: %s", dbname.c_str());

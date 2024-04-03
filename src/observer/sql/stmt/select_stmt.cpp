@@ -33,7 +33,7 @@ SelectStmt::~SelectStmt()
 static void wildcard_fields(Table* table, std::vector<Field>& field_metas, AggregationType aggr_type)
 {
     const TableMeta& table_meta = table->table_meta();
-    const int        field_num = table_meta.field_num();
+    const int        field_num  = table_meta.field_num();
     if (aggr_type == AggregationType::F_COUNT_ALL)
     {
         field_metas.push_back(Field(table, table_meta.field(0), aggr_type));
@@ -81,10 +81,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
     for (int i = static_cast<int>(select_sql.attributes.size()) - 1; i >= 0; i--)
     {
         const RelAttrSqlNode& relation_attr = select_sql.attributes[i];
-        if (!relation_attr.ValidAgg)
-        {
-            return RC::INVALID_ARGUMENT;
-        }
+        if (!relation_attr.ValidAgg) { return RC::INVALID_ARGUMENT; }
         AggregationType aggr_type = relation_attr.aggr_type();
         if (common::is_blank(relation_attr.relation_name.c_str()) &&
             0 == strcmp(relation_attr.attribute_name.c_str(), "*"))
@@ -123,8 +120,8 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                 }
 
                 Table* table = iter->second;
-                if (0 == strcmp(field_name, "*")) 
-                { 
+                if (0 == strcmp(field_name, "*"))
+                {
                     if (aggr_type != AggregationType::F_COUNT_ALL && aggr_type != AggregationType::NOTAGG)
                     {
                         LOG_WARN("invalid aggregation type. field=%s.%s.%s", db->name(), table->name(), field_name);
@@ -152,7 +149,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
                 return RC::SCHEMA_FIELD_MISSING;
             }
 
-            Table*           table = tables[0];
+            Table*           table      = tables[0];
             const FieldMeta* field_meta = table->table_meta().field(relation_attr.attribute_name.c_str());
             if (nullptr == field_meta)
             {
@@ -171,7 +168,7 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
     // create filter statement in `where` statement
 
     FilterStmt* filter_stmt = nullptr;
-    RC          rc = FilterStmt::create(db,
+    RC          rc          = FilterStmt::create(db,
         default_table,
         &table_map,
         select_sql.conditions.data(),
@@ -188,6 +185,6 @@ RC SelectStmt::create(Db* db, const SelectSqlNode& select_sql, Stmt*& stmt)
     select_stmt->tables_.swap(tables);
     select_stmt->query_fields_.swap(query_fields);
     select_stmt->filter_stmt_ = filter_stmt;
-    stmt = select_stmt;
+    stmt                      = select_stmt;
     return RC::SUCCESS;
 }

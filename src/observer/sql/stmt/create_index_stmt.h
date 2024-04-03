@@ -31,8 +31,7 @@ class CreateIndexStmt : public Stmt
   public:
     CreateIndexStmt(Table* table, const FieldMeta* field_meta, const std::string& index_name)
         : table_(table), field_meta_(field_meta), index_name_(index_name)
-    {
-    }
+    {}
 
     virtual ~CreateIndexStmt() = default;
 
@@ -46,7 +45,7 @@ class CreateIndexStmt : public Stmt
     static RC create(Db* db, const CreateIndexSqlNode& create_index, Stmt*& stmt);
 
   private:
-    Table*           table_ = nullptr;
+    Table*           table_      = nullptr;
     const FieldMeta* field_meta_ = nullptr;
     std::string      index_name_;
 };

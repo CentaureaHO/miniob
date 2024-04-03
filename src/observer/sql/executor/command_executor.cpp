@@ -33,64 +33,76 @@ RC CommandExecutor::execute(SQLStageEvent* sql_event)
 
     switch (stmt->type())
     {
-        case StmtType::CREATE_INDEX: {
+        case StmtType::CREATE_INDEX:
+        {
             CreateIndexExecutor executor;
             return executor.execute(sql_event);
         }
         break;
 
-        case StmtType::CREATE_TABLE: {
+        case StmtType::CREATE_TABLE:
+        {
             CreateTableExecutor executor;
             return executor.execute(sql_event);
         }
         break;
 
-        case StmtType::DESC_TABLE: {
+        case StmtType::DESC_TABLE:
+        {
             DescTableExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::HELP: {
+        case StmtType::HELP:
+        {
             HelpExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::SHOW_TABLES: {
+        case StmtType::SHOW_TABLES:
+        {
             ShowTablesExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::BEGIN: {
+        case StmtType::BEGIN:
+        {
             TrxBeginExecutor executor;
             return executor.execute(sql_event);
         }
 
         case StmtType::COMMIT:
-        case StmtType::ROLLBACK: {
+        case StmtType::ROLLBACK:
+        {
             TrxEndExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::SET_VARIABLE: {
+        case StmtType::SET_VARIABLE:
+        {
             SetVariableExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::LOAD_DATA: {
+        case StmtType::LOAD_DATA:
+        {
             LoadDataExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::DROP_TABLE: {
+        case StmtType::DROP_TABLE:
+        {
             DropTableExecutor executor;
             return executor.execute(sql_event);
         }
 
-        case StmtType::EXIT: {
+        case StmtType::EXIT:
+        {
             return RC::SUCCESS;
         }
 
-        default: {
+        default:
+        {
             LOG_ERROR("unknown command: %d", static_cast<int>(stmt->type()));
             return RC::UNIMPLENMENT;
         }

@@ -24,7 +24,7 @@ class ThreadData
     static void        setup(ThreadData* thread) { thread_data_ = thread; }
 
   public:
-    ThreadData() = default;
+    ThreadData()  = default;
     ~ThreadData() = default;
 
     Session* session() const { return session_; }

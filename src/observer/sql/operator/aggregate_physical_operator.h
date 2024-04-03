@@ -15,9 +15,9 @@ class Trx;
  */
 class AggregationPhysicalOperator : public PhysicalOperator
 {
-public:
+  public:
     AggregationPhysicalOperator() {}
-    AggregationPhysicalOperator(const std::vector<AggregationType> aggs): aggs_(aggs) {}
+    AggregationPhysicalOperator(const std::vector<AggregationType> aggs) : aggs_(aggs) {}
     virtual ~AggregationPhysicalOperator() = default;
 
     PhysicalOperatorType type() const override { return PhysicalOperatorType::AGGREGATE; }
@@ -30,7 +30,7 @@ public:
 
     Tuple* current_tuple() override { return &result_tuple_; }
 
-private:
+  private:
     std::vector<AggregationType> aggs_;
-    ValueListTuple result_tuple_;
+    ValueListTuple               result_tuple_;
 };

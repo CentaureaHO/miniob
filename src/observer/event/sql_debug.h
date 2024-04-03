@@ -27,7 +27,7 @@ See the Mulan PSL v2 for more details. */
 class SqlDebug
 {
   public:
-    SqlDebug() = default;
+    SqlDebug()          = default;
     virtual ~SqlDebug() = default;
 
     void add_debug_info(const std::string& debug_info);

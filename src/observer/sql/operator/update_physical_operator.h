@@ -27,5 +27,5 @@ class UpdatePhysicalOperator : public PhysicalOperator
     Table* table_ = nullptr;
     Value  value_;
     char*  field_name_ = nullptr;
-    Trx*   trx_ = nullptr;
+    Trx*   trx_        = nullptr;
 };

@@ -144,7 +144,7 @@ class BPFrameManager
         size_t operator()(const FrameId& frame_id) const { return frame_id.hash(); }
     };
 
-    using FrameLruCache = common::LruCache<FrameId, Frame*, BPFrameIdHasher>;
+    using FrameLruCache  = common::LruCache<FrameId, Frame*, BPFrameIdHasher>;
     using FrameAllocator = common::MemPoolSimple<Frame>;
 
     std::mutex     lock_;
@@ -279,8 +279,8 @@ class DiskBufferPool
     BPFrameManager&    frame_manager_;
 
     std::string       file_name_;
-    int               file_desc_ = -1;
-    Frame*            hdr_frame_ = nullptr;
+    int               file_desc_   = -1;
+    Frame*            hdr_frame_   = nullptr;
     BPFileHeader*     file_header_ = nullptr;
     std::set<PageNum> disposed_pages_;
 

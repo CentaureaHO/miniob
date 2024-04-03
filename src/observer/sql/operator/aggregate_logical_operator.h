@@ -13,13 +13,13 @@
  */
 class AggregationLogicalOperator : public LogicalOperator
 {
-public:
+  public:
     AggregationLogicalOperator(const std::vector<Field>& fields);
     virtual ~AggregationLogicalOperator() = default;
 
-    LogicalOperatorType type() const override { return LogicalOperatorType::AGGREGATE; }
+    LogicalOperatorType       type() const override { return LogicalOperatorType::AGGREGATE; }
     const std::vector<Field>& fields() const { return fields_; }
 
-private:
+  private:
     std::vector<Field> fields_;
 };

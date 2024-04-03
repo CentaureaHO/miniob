@@ -29,12 +29,12 @@ See the Mulan PSL v2 for more details. */
 class TrxEndExecutor
 {
   public:
-    TrxEndExecutor() = default;
+    TrxEndExecutor()          = default;
     virtual ~TrxEndExecutor() = default;
 
     RC execute(SQLStageEvent* sql_event)
     {
-        Stmt*         stmt = sql_event->stmt();
+        Stmt*         stmt          = sql_event->stmt();
         SessionEvent* session_event = sql_event->session_event();
 
         Session* session = session_event->session();

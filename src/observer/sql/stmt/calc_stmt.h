@@ -31,7 +31,7 @@ class Table;
 class CalcStmt : public Stmt
 {
   public:
-    CalcStmt() = default;
+    CalcStmt()                   = default;
     virtual ~CalcStmt() override = default;
 
     StmtType type() const override { return StmtType::CALC; }

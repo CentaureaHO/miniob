@@ -45,42 +45,49 @@ RC LogicalPlanGenerator::create(Stmt* stmt, unique_ptr<LogicalOperator>& logical
     RC rc = RC::SUCCESS;
     switch (stmt->type())
     {
-        case StmtType::CALC: {
+        case StmtType::CALC:
+        {
             CalcStmt* calc_stmt = static_cast<CalcStmt*>(stmt);
-            rc = create_plan(calc_stmt, logical_operator);
+            rc                  = create_plan(calc_stmt, logical_operator);
         }
         break;
 
-        case StmtType::SELECT: {
+        case StmtType::SELECT:
+        {
             SelectStmt* select_stmt = static_cast<SelectStmt*>(stmt);
-            rc = create_plan(select_stmt, logical_operator);
+            rc                      = create_plan(select_stmt, logical_operator);
         }
         break;
 
-        case StmtType::INSERT: {
+        case StmtType::INSERT:
+        {
             InsertStmt* insert_stmt = static_cast<InsertStmt*>(stmt);
-            rc = create_plan(insert_stmt, logical_operator);
+            rc                      = create_plan(insert_stmt, logical_operator);
         }
         break;
 
-        case StmtType::DELETE: {
+        case StmtType::DELETE:
+        {
             DeleteStmt* delete_stmt = static_cast<DeleteStmt*>(stmt);
-            rc = create_plan(delete_stmt, logical_operator);
+            rc                      = create_plan(delete_stmt, logical_operator);
         }
         break;
 
-        case StmtType::EXPLAIN: {
+        case StmtType::EXPLAIN:
+        {
             ExplainStmt* explain_stmt = static_cast<ExplainStmt*>(stmt);
-            rc = create_plan(explain_stmt, logical_operator);
+            rc                        = create_plan(explain_stmt, logical_operator);
         }
         break;
 
-        case StmtType::UPDATE: {
+        case StmtType::UPDATE:
+        {
             UpdateStmt* update_stmt = static_cast<UpdateStmt*>(stmt);
-            rc = create_plan(update_stmt, logical_operator);
+            rc                      = create_plan(update_stmt, logical_operator);
         }
         break;
-        default: {
+        default:
+        {
             rc = RC::UNIMPLENMENT;
         }
     }
@@ -97,7 +104,7 @@ RC LogicalPlanGenerator::create_plan(SelectStmt* select_stmt, unique_ptr<Logical
 {
     unique_ptr<LogicalOperator> table_oper(nullptr);
 
-    const std::vector<Table*>& tables = select_stmt->tables();
+    const std::vector<Table*>& tables     = select_stmt->tables();
     const std::vector<Field>&  all_fields = select_stmt->query_fields();
     for (Table* table : tables)
     {
@@ -140,8 +147,8 @@ RC LogicalPlanGenerator::create_plan(SelectStmt* select_stmt, unique_ptr<Logical
     bool AggFlag = 0;
     for (const Field& field : all_fields)
         if (field.func() != AggregationType::NOTAGG)
-        { 
-            AggFlag = 1; 
+        {
+            AggFlag = 1;
             break;
         }
 
@@ -151,7 +158,8 @@ RC LogicalPlanGenerator::create_plan(SelectStmt* select_stmt, unique_ptr<Logical
         aggregation_oper->add_child(std::move(project_oper));
         logical_operator.swap(aggregation_oper);
     }
-    else logical_operator.swap(project_oper);
+    else
+        logical_operator.swap(project_oper);
     return RC::SUCCESS;
 }
 
@@ -161,7 +169,7 @@ RC LogicalPlanGenerator::create_plan(FilterStmt* filter_stmt, unique_ptr<Logical
     const std::vector<FilterUnit*>&     filter_units = filter_stmt->filter_units();
     for (const FilterUnit* filter_unit : filter_units)
     {
-        const FilterObj& filter_obj_left = filter_unit->left();
+        const FilterObj& filter_obj_left  = filter_unit->left();
         const FilterObj& filter_obj_right = filter_unit->right();
 
         unique_ptr<Expression> left(filter_obj_left.is_attr
@@ -200,7 +208,7 @@ RC LogicalPlanGenerator::create_plan(InsertStmt* insert_stmt, unique_ptr<Logical
 
 RC LogicalPlanGenerator::create_plan(DeleteStmt* delete_stmt, unique_ptr<LogicalOperator>& logical_operator)
 {
-    Table*             table = delete_stmt->table();
+    Table*             table       = delete_stmt->table();
     FilterStmt*        filter_stmt = delete_stmt->filter_stmt();
     std::vector<Field> fields;
     for (int i = table->table_meta().sys_field_num(); i < table->table_meta().field_num(); i++)
@@ -246,7 +254,7 @@ RC LogicalPlanGenerator::create_plan(ExplainStmt* explain_stmt, unique_ptr<Logic
 RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<LogicalOperator>& logical_operator)
 {
     // 从更新语句中获取表对象； 通过表对象获取表的元数据; 定义一个字段向量，用于存储表的所有字段
-    Table*             table = update_stmt->table();
+    Table*             table      = update_stmt->table();
     const TableMeta&   table_meta = table->table_meta();
     std::vector<Field> fields;
 

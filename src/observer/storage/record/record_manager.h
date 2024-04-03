@@ -106,7 +106,7 @@ class RecordPageIterator
 
   private:
     RecordPageHandler* record_page_handler_ = nullptr;
-    PageNum            page_num_ = BP_INVALID_PAGE_NUM;
+    PageNum            page_num_            = BP_INVALID_PAGE_NUM;
     common::Bitmap     bitmap_;             ///< bitmap 的相关信息可以参考 RecordPageHandler 的说明
     SlotNum            next_slot_num_ = 0;  ///< 当前遍历到了哪一个slot
 };
@@ -241,9 +241,9 @@ class RecordPageHandler
   protected:
     DiskBufferPool* disk_buffer_pool_ = nullptr;  ///< 当前操作的buffer pool(文件)
     Frame* frame_ = nullptr;  ///< 当前操作页面关联的frame(frame的更多概念可以参考buffer pool和frame)
-    bool   readonly_ = false;            ///< 当前的操作是否都是只读的
+    bool   readonly_         = false;    ///< 当前的操作是否都是只读的
     PageHeader* page_header_ = nullptr;  ///< 当前页面上页面头
-    char*       bitmap_ = nullptr;       ///< 当前页面上record分配状态信息bitmap内存起始位置
+    char*       bitmap_      = nullptr;  ///< 当前页面上record分配状态信息bitmap内存起始位置
 
   private:
     friend class RecordPageIterator;
@@ -399,8 +399,8 @@ class RecordFileScanner
     // TODO 对于一个纯粹的record遍历器来说，不应该关心表和事务
     Table* table_ = nullptr;  ///< 当前遍历的是哪张表。这个字段仅供事务函数使用，如果设计合适，可以去掉
     DiskBufferPool* disk_buffer_pool_ = nullptr;  ///< 当前访问的文件
-    Trx*            trx_ = nullptr;               ///< 当前是哪个事务在遍历
-    bool            readonly_ = false;            ///< 遍历出来的数据，是否可能对它做修改
+    Trx*            trx_              = nullptr;  ///< 当前是哪个事务在遍历
+    bool            readonly_         = false;    ///< 遍历出来的数据，是否可能对它做修改
 
     BufferPoolIterator bp_iterator_;                 ///< 遍历buffer pool的所有页面
     ConditionFilter*   condition_filter_ = nullptr;  ///< 过滤record

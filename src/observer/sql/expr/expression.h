@@ -59,7 +59,7 @@ enum class ExprType
 class Expression
 {
   public:
-    Expression() = default;
+    Expression()          = default;
     virtual ~Expression() = default;
 
     /**

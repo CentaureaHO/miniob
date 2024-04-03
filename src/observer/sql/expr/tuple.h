@@ -52,9 +52,15 @@ class Table;
 class TupleSchema
 {
   public:
-    void                 append_cell(const TupleCellSpec& cell) { cells_.push_back(cell); }
-    void                 append_cell(const char* table, const char* field, AggregationType agg_type = AggregationType::NOTAGG) { append_cell(TupleCellSpec(table, field, nullptr, agg_type)); }
-    void                 append_cell(const char* alias, AggregationType agg_type = AggregationType::NOTAGG) { append_cell(TupleCellSpec(alias, agg_type)); }
+    void append_cell(const TupleCellSpec& cell) { cells_.push_back(cell); }
+    void append_cell(const char* table, const char* field, AggregationType agg_type = AggregationType::NOTAGG)
+    {
+        append_cell(TupleCellSpec(table, field, nullptr, agg_type));
+    }
+    void append_cell(const char* alias, AggregationType agg_type = AggregationType::NOTAGG)
+    {
+        append_cell(TupleCellSpec(alias, agg_type));
+    }
     int                  cell_num() const { return static_cast<int>(cells_.size()); }
     const TupleCellSpec& cell_at(int i) const { return cells_[i]; }
 
@@ -69,7 +75,7 @@ class TupleSchema
 class Tuple
 {
   public:
-    Tuple() = default;
+    Tuple()          = default;
     virtual ~Tuple() = default;
 
     /**
@@ -166,7 +172,7 @@ class RowTuple : public Tuple
         for (size_t i = 0; i < speces_.size(); ++i)
         {
             const FieldExpr* field_expr = speces_[i];
-            const Field&     field = field_expr->field();
+            const Field&     field      = field_expr->field();
             if (0 == strcmp(field_name, field.field_name())) { return cell_at(i, cell); }
         }
         return RC::NOTFOUND;
@@ -190,7 +196,7 @@ class RowTuple : public Tuple
 
   private:
     Record*                 record_ = nullptr;
-    const Table*            table_ = nullptr;
+    const Table*            table_  = nullptr;
     std::vector<FieldExpr*> speces_;
 };
 
@@ -279,7 +285,7 @@ class ExpressionTuple : public Tuple
 class ValueListTuple : public Tuple
 {
   public:
-    ValueListTuple() = default;
+    ValueListTuple()          = default;
     virtual ~ValueListTuple() = default;
 
     void set_cells(const std::vector<Value>& cells) { cells_ = cells; }
@@ -308,7 +314,7 @@ class ValueListTuple : public Tuple
 class JoinedTuple : public Tuple
 {
   public:
-    JoinedTuple() = default;
+    JoinedTuple()          = default;
     virtual ~JoinedTuple() = default;
 
     void set_left(Tuple* left) { left_ = left; }
@@ -338,6 +344,6 @@ class JoinedTuple : public Tuple
     }
 
   private:
-    Tuple* left_ = nullptr;
+    Tuple* left_  = nullptr;
     Tuple* right_ = nullptr;
 };

@@ -48,11 +48,11 @@ RC FieldMeta::init(const char* name, AttrType attr_type, int attr_offset, int at
         return RC::INVALID_ARGUMENT;
     }
 
-    name_ = name;
-    attr_type_ = attr_type;
-    attr_len_ = attr_len;
+    name_        = name;
+    attr_type_   = attr_type;
+    attr_len_    = attr_len;
     attr_offset_ = attr_offset;
-    visible_ = visible;
+    visible_     = visible;
 
     LOG_INFO("Init a field with name=%s", name);
     return RC::SUCCESS;
@@ -76,10 +76,10 @@ void FieldMeta::desc(std::ostream& os) const
 
 void FieldMeta::to_json(Json::Value& json_value) const
 {
-    json_value[FIELD_NAME] = name_;
-    json_value[FIELD_TYPE] = attr_type_to_string(attr_type_);
-    json_value[FIELD_OFFSET] = attr_offset_;
-    json_value[FIELD_LEN] = attr_len_;
+    json_value[FIELD_NAME]    = name_;
+    json_value[FIELD_TYPE]    = attr_type_to_string(attr_type_);
+    json_value[FIELD_OFFSET]  = attr_offset_;
+    json_value[FIELD_LEN]     = attr_len_;
     json_value[FIELD_VISIBLE] = visible_;
 }
 
@@ -91,10 +91,10 @@ RC FieldMeta::from_json(const Json::Value& json_value, FieldMeta& field)
         return RC::INTERNAL;
     }
 
-    const Json::Value& name_value = json_value[FIELD_NAME];
-    const Json::Value& type_value = json_value[FIELD_TYPE];
-    const Json::Value& offset_value = json_value[FIELD_OFFSET];
-    const Json::Value& len_value = json_value[FIELD_LEN];
+    const Json::Value& name_value    = json_value[FIELD_NAME];
+    const Json::Value& type_value    = json_value[FIELD_TYPE];
+    const Json::Value& offset_value  = json_value[FIELD_OFFSET];
+    const Json::Value& len_value     = json_value[FIELD_LEN];
     const Json::Value& visible_value = json_value[FIELD_VISIBLE];
 
     if (!name_value.isString())
@@ -131,9 +131,9 @@ RC FieldMeta::from_json(const Json::Value& json_value, FieldMeta& field)
         return RC::INTERNAL;
     }
 
-    const char* name = name_value.asCString();
-    int         offset = offset_value.asInt();
-    int         len = len_value.asInt();
+    const char* name    = name_value.asCString();
+    int         offset  = offset_value.asInt();
+    int         len     = len_value.asInt();
     bool        visible = visible_value.asBool();
     return field.init(name, type, offset, len, visible);
 }

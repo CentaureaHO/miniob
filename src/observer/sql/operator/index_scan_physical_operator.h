@@ -47,11 +47,11 @@ class IndexScanPhysicalOperator : public PhysicalOperator
     RC filter(RowTuple& tuple, bool& result);
 
   private:
-    Trx*               trx_ = nullptr;
-    Table*             table_ = nullptr;
-    Index*             index_ = nullptr;
-    bool               readonly_ = false;
-    IndexScanner*      index_scanner_ = nullptr;
+    Trx*               trx_            = nullptr;
+    Table*             table_          = nullptr;
+    Index*             index_          = nullptr;
+    bool               readonly_       = false;
+    IndexScanner*      index_scanner_  = nullptr;
     RecordFileHandler* record_handler_ = nullptr;
 
     RecordPageHandler record_page_handler_;
@@ -60,7 +60,7 @@ class IndexScanPhysicalOperator : public PhysicalOperator
 
     Value left_value_;
     Value right_value_;
-    bool  left_inclusive_ = false;
+    bool  left_inclusive_  = false;
     bool  right_inclusive_ = false;
 
     std::vector<std::unique_ptr<Expression>> predicates_;

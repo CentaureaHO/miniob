@@ -40,7 +40,7 @@ class AggregationLogicalOperator;
 class PhysicalPlanGenerator
 {
   public:
-    PhysicalPlanGenerator() = default;
+    PhysicalPlanGenerator()          = default;
     virtual ~PhysicalPlanGenerator() = default;
 
     RC create(LogicalOperator& logical_operator, std::unique_ptr<PhysicalOperator>& oper);

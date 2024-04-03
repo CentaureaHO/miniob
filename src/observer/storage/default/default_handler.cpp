@@ -56,7 +56,7 @@ RC DefaultHandler::init(const char* base_dir)
     }
 
     base_dir_ = base_dir;
-    db_dir_ = tmp + "/";
+    db_dir_   = tmp + "/";
 
     const char* sys_db = "sys";
 
@@ -129,7 +129,7 @@ RC DefaultHandler::open_db(const char* dbname)
     if (!common::is_directory(dbpath.c_str())) { return RC::SCHEMA_DB_NOT_EXIST; }
 
     // open db
-    Db* db = new Db();
+    Db* db  = new Db();
     RC  ret = RC::SUCCESS;
     if ((ret = db->init(dbname, dbpath.c_str())) != RC::SUCCESS)
     {
@@ -185,7 +185,7 @@ RC DefaultHandler::sync()
     for (const auto& db_pair : opened_dbs_)
     {
         Db* db = db_pair.second;
-        rc = db->sync();
+        rc     = db->sync();
         if (rc != RC::SUCCESS)
         {
             LOG_ERROR("Failed to sync db. name=%s, rc=%d:%s", db->name(), rc, strrc(rc));

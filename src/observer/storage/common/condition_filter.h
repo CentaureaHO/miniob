@@ -64,7 +64,7 @@ class DefaultConditionFilter : public ConditionFilter
     ConDesc  left_;
     ConDesc  right_;
     AttrType attr_type_ = UNDEFINED;
-    CompOp   comp_op_ = NO_OP;
+    CompOp   comp_op_   = NO_OP;
 };
 
 class CompositeConditionFilter : public ConditionFilter
@@ -85,7 +85,7 @@ class CompositeConditionFilter : public ConditionFilter
     RC init(const ConditionFilter* filters[], int filter_num, bool own_memory);
 
   private:
-    const ConditionFilter** filters_ = nullptr;
-    int                     filter_num_ = 0;
+    const ConditionFilter** filters_      = nullptr;
+    int                     filter_num_   = 0;
     bool                    memory_owner_ = false;  // filters_的内存是否由自己来控制
 };

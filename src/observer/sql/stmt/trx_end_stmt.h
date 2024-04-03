@@ -34,7 +34,7 @@ class TrxEndStmt : public Stmt
     static RC create(SqlCommandFlag flag, Stmt*& stmt)
     {
         StmtType type = flag == SqlCommandFlag::SCF_COMMIT ? StmtType::COMMIT : StmtType::ROLLBACK;
-        stmt = new TrxEndStmt(type);
+        stmt          = new TrxEndStmt(type);
         return RC::SUCCESS;
     }
 

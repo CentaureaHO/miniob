@@ -17,7 +17,8 @@ See the Mulan PSL v2 for more details. */
 const char* strrc(RC rc)
 {
 #define DEFINE_RC(name) \
-    case RC::name: {    \
+    case RC::name:      \
+    {                   \
         return #name;   \
     }                   \
     break;
@@ -25,7 +26,8 @@ const char* strrc(RC rc)
     switch (rc)
     {
         DEFINE_RCS;
-        default: {
+        default:
+        {
             return "unkown";
         }
     }

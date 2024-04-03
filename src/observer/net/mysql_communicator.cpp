@@ -31,7 +31,7 @@ See the Mulan PSL v2 for more details. */
 // the flags below are negotiate by handshake packet
 const uint32_t CLIENT_PROTOCOL_41 = 512;
 // const uint32_t CLIENT_INTERACTIVE   = 1024;  // This is an interactive client
-const uint32_t CLIENT_TRANSACTIONS = 8192;          // Client knows about transactions.
+const uint32_t CLIENT_TRANSACTIONS  = 8192;         // Client knows about transactions.
 const uint32_t CLIENT_SESSION_TRACK = (1UL << 23);  // Capable of handling server state change information
 const uint32_t CLIENT_DEPRECATE_EOF = (1UL << 24);  // Client no longer needs EOF_Packet and will use OK_Packet instead
 const uint32_t CLIENT_OPTIONAL_RESULTSET_METADATA =
@@ -87,19 +87,19 @@ enum enum_field_types
     MYSQL_TYPE_DATETIME2,   /**< Internal to MySQL. Not used in protocol */
     MYSQL_TYPE_TIME2,       /**< Internal to MySQL. Not used in protocol */
     MYSQL_TYPE_TYPED_ARRAY, /**< Used for replication only */
-    MYSQL_TYPE_INVALID = 243,
-    MYSQL_TYPE_BOOL = 244, /**< Currently just a placeholder */
-    MYSQL_TYPE_JSON = 245,
-    MYSQL_TYPE_NEWDECIMAL = 246,
-    MYSQL_TYPE_ENUM = 247,
-    MYSQL_TYPE_SET = 248,
-    MYSQL_TYPE_TINY_BLOB = 249,
+    MYSQL_TYPE_INVALID     = 243,
+    MYSQL_TYPE_BOOL        = 244, /**< Currently just a placeholder */
+    MYSQL_TYPE_JSON        = 245,
+    MYSQL_TYPE_NEWDECIMAL  = 246,
+    MYSQL_TYPE_ENUM        = 247,
+    MYSQL_TYPE_SET         = 248,
+    MYSQL_TYPE_TINY_BLOB   = 249,
     MYSQL_TYPE_MEDIUM_BLOB = 250,
-    MYSQL_TYPE_LONG_BLOB = 251,
-    MYSQL_TYPE_BLOB = 252,
-    MYSQL_TYPE_VAR_STRING = 253,
-    MYSQL_TYPE_STRING = 254,
-    MYSQL_TYPE_GEOMETRY = 255
+    MYSQL_TYPE_LONG_BLOB   = 251,
+    MYSQL_TYPE_BLOB        = 252,
+    MYSQL_TYPE_VAR_STRING  = 253,
+    MYSQL_TYPE_STRING      = 254,
+    MYSQL_TYPE_GEOMETRY    = 255
 };
 
 /**
@@ -322,17 +322,17 @@ class BasePacket
  */
 struct HandshakeV10 : public BasePacket
 {
-    int8_t  protocol = 10;
+    int8_t  protocol          = 10;
     char    server_version[7] = "5.7.25";
-    int32_t thread_id = 21501807;  // conn id
+    int32_t thread_id         = 21501807;  // conn id
     char    auth_plugin_data_part_1[9] =
-        "12345678";                       // first 8 bytes of the plugin provided data (scramble) // and the filler
-    int16_t capability_flags_1 = 0xF7DF;  // The lower 2 bytes of the Capabilities Flags
-    int8_t  character_set = 83;
-    int16_t status_flags = 0;
-    int16_t capability_flags_2 = 0x0000;
-    int8_t  auth_plugin_data_len = 0;
-    char    reserved[10] = {0};
+        "12345678";  // first 8 bytes of the plugin provided data (scramble) // and the filler
+    int16_t capability_flags_1          = 0xF7DF;  // The lower 2 bytes of the Capabilities Flags
+    int8_t  character_set               = 83;
+    int16_t status_flags                = 0;
+    int16_t capability_flags_2          = 0x0000;
+    int8_t  auth_plugin_data_len        = 0;
+    char    reserved[10]                = {0};
     char    auth_plugin_data_part_2[13] = "bbbbbbbbbbbb";
 
     HandshakeV10(int8_t sequence = 0) : BasePacket(sequence) {}
@@ -378,11 +378,11 @@ struct HandshakeV10 : public BasePacket
  */
 struct OkPacket : public BasePacket
 {
-    int8_t      header = 0;  // 0x00 for ok and 0xFE for EOF
-    int32_t     affected_rows = 0;
+    int8_t      header         = 0;  // 0x00 for ok and 0xFE for EOF
+    int32_t     affected_rows  = 0;
     int32_t     last_insert_id = 0;
-    int16_t     status_flags = 0x22;
-    int16_t     warnings = 0;
+    int16_t     status_flags   = 0x22;
+    int16_t     warnings       = 0;
     std::string info;  // human readable status information
 
     OkPacket(int8_t sequence = 0) : BasePacket(sequence) {}
@@ -428,8 +428,8 @@ struct OkPacket : public BasePacket
  */
 struct EofPacket : public BasePacket
 {
-    int8_t  header = 0xFE;
-    int16_t warnings = 0;
+    int8_t  header       = 0xFE;
+    int16_t warnings     = 0;
     int16_t status_flags = 0x22;
 
     EofPacket(int8_t sequence = 0) : BasePacket(sequence) {}
@@ -470,8 +470,8 @@ struct EofPacket : public BasePacket
  */
 struct ErrPacket : public BasePacket
 {
-    int8_t      header = 0xFF;
-    int16_t     error_code = 0;
+    int8_t      header              = 0xFF;
+    int16_t     error_code          = 0;
     char        sql_state_marker[1] = {'#'};
     std::string sql_state{"HY000"};
     std::string error_message;
@@ -650,7 +650,7 @@ RC MysqlCommunicator::read_event(SessionEvent*& event)
         // send ok packet and return
         OkPacket ok_packet;
         ok_packet.packet_header.sequence_id = sequence_id_;
-        rc = send_packet(ok_packet);
+        rc                                  = send_packet(ok_packet);
         if (rc != RC::SUCCESS) { LOG_WARN("failed to send ok packet while auth"); }
         writer_->flush();
         authed_ = true;
@@ -701,8 +701,8 @@ RC MysqlCommunicator::write_state(SessionEvent* event, bool& need_disconnect)
 {
     SqlResult* sql_result = event->sql_result();
 
-    const int          buf_size = 2048;
-    char*              buf = new char[buf_size];
+    const int          buf_size     = 2048;
+    char*              buf          = new char[buf_size];
     const std::string& state_string = sql_result->state_string();
     if (state_string.empty())
     {
@@ -724,9 +724,9 @@ RC MysqlCommunicator::write_state(SessionEvent* event, bool& need_disconnect)
     {
         ErrPacket err_packet;
         err_packet.packet_header.sequence_id = sequence_id_++;
-        err_packet.error_code = static_cast<int>(sql_result->return_code());
-        err_packet.error_message = buf;
-        rc = send_packet(err_packet);
+        err_packet.error_code                = static_cast<int>(sql_result->return_code());
+        err_packet.error_message             = buf;
+        rc                                   = send_packet(err_packet);
     }
     if (rc != RC::SUCCESS)
     {
@@ -744,13 +744,13 @@ RC MysqlCommunicator::write_result(SessionEvent* event, bool& need_disconnect)
 {
     RC rc = RC::SUCCESS;
 
-    need_disconnect = true;
+    need_disconnect       = true;
     SqlResult* sql_result = event->sql_result();
     if (nullptr == sql_result)
     {
 
         const char* response = "Unexpected error: no result";
-        const int   len = strlen(response);
+        const int   len      = strlen(response);
         OkPacket    ok_packet;  // TODO if error occurs, we should send an error packet to client
         ok_packet.info.assign(response, len);
         rc = send_packet(ok_packet);
@@ -779,7 +779,7 @@ RC MysqlCommunicator::write_result(SessionEvent* event, bool& need_disconnect)
         }
 
         const TupleSchema& tuple_schema = sql_result->tuple_schema();
-        const int          cell_num = tuple_schema.cell_num();
+        const int          cell_num     = tuple_schema.cell_num();
         if (cell_num == 0)
         {
             // maybe a dml that send nothing to client
@@ -836,9 +836,9 @@ RC MysqlCommunicator::send_packet(const BasePacket& packet)
  */
 RC MysqlCommunicator::send_column_definition(SqlResult* sql_result, bool& need_disconnect)
 {
-    RC                 rc = RC::SUCCESS;
+    RC                 rc           = RC::SUCCESS;
     const TupleSchema& tuple_schema = sql_result->tuple_schema();
-    const int          cell_num = tuple_schema.cell_num();
+    const int          cell_num     = tuple_schema.cell_num();
 
     if (cell_num == 0) { return rc; }
 
@@ -883,20 +883,20 @@ RC MysqlCommunicator::send_column_definition(SqlResult* sql_result, bool& need_d
         store_int1(buf + pos, sequence_id_++);
         pos += 1;
 
-        const TupleCellSpec& spec = tuple_schema.cell_at(i);
-        const char*          catalog = "def";  // The catalog used. Currently always "def"
-        const char*          schema = "sys";   // schema name
-        const char*          table = spec.table_name();
+        const TupleCellSpec& spec      = tuple_schema.cell_at(i);
+        const char*          catalog   = "def";  // The catalog used. Currently always "def"
+        const char*          schema    = "sys";  // schema name
+        const char*          table     = spec.table_name();
         const char*          org_table = spec.table_name();
-        const char*          name = spec.alias();
+        const char*          name      = spec.alias();
         // const char *org_name = spec.field_name();
-        const char* org_name = spec.alias();
+        const char* org_name         = spec.alias();
         int         fixed_len_fields = 0x0c;
-        int         character_set = 33;
-        int         column_length = 16384;
-        int         type = MYSQL_TYPE_VAR_STRING;
-        int16_t     flags = 0;
-        int8_t      decimals = 0x1f;
+        int         character_set    = 33;
+        int         column_length    = 16384;
+        int         type             = MYSQL_TYPE_VAR_STRING;
+        int16_t     flags            = 0;
+        int8_t      decimals         = 0x1f;
 
         pos += store_lenenc_string(buf + pos, catalog);
         pos += store_lenenc_string(buf + pos, schema);
@@ -936,8 +936,8 @@ RC MysqlCommunicator::send_column_definition(SqlResult* sql_result, bool& need_d
     {
         EofPacket eof_packet;
         eof_packet.packet_header.sequence_id = sequence_id_++;
-        eof_packet.status_flags = 0x02;
-        rc = send_packet(eof_packet);
+        eof_packet.status_flags              = 0x02;
+        rc                                   = send_packet(eof_packet);
         if (rc != RC::SUCCESS)
         {
             need_disconnect = true;
@@ -964,7 +964,7 @@ RC MysqlCommunicator::send_result_rows(SqlResult* sql_result, bool no_column_def
     packet.resize(4 * 1024 * 1024);  // TODO warning: length cannot be fix
 
     int    affected_rows = 0;
-    Tuple* tuple = nullptr;
+    Tuple* tuple         = nullptr;
     while (RC::SUCCESS == (rc = sql_result->next_tuple(tuple)))
     {
         assert(tuple != nullptr);
@@ -1013,15 +1013,15 @@ RC MysqlCommunicator::send_result_rows(SqlResult* sql_result, bool no_column_def
         LOG_TRACE("client has CLIENT_DEPRECATE_EOF or has empty column, send ok packet");
         OkPacket ok_packet;
         ok_packet.packet_header.sequence_id = sequence_id_++;
-        ok_packet.affected_rows = affected_rows;
-        rc = send_packet(ok_packet);
+        ok_packet.affected_rows             = affected_rows;
+        rc                                  = send_packet(ok_packet);
     }
     else
     {
         LOG_TRACE("send eof packet to client");
         EofPacket eof_packet;
         eof_packet.packet_header.sequence_id = sequence_id_++;
-        rc = send_packet(eof_packet);
+        rc                                   = send_packet(eof_packet);
     }
 
     LOG_TRACE("send rows to client done");

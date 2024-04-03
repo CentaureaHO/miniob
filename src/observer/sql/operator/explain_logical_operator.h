@@ -23,7 +23,7 @@ See the Mulan PSL v2 for more details. */
 class ExplainLogicalOperator : public LogicalOperator
 {
   public:
-    ExplainLogicalOperator() = default;
+    ExplainLogicalOperator()          = default;
     virtual ~ExplainLogicalOperator() = default;
 
     LogicalOperatorType type() const override { return LogicalOperatorType::EXPLAIN; }

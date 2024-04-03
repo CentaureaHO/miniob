@@ -37,7 +37,7 @@ class IndexScanner;
 class Index
 {
   public:
-    Index() = default;
+    Index()          = default;
     virtual ~Index() = default;
 
     const IndexMeta& index_meta() const { return index_meta_; }
@@ -92,7 +92,7 @@ class Index
 class IndexScanner
 {
   public:
-    IndexScanner() = default;
+    IndexScanner()          = default;
     virtual ~IndexScanner() = default;
 
     /**
@@ -100,5 +100,5 @@ class IndexScanner
      * 如果没有更多的元素，返回RECORD_EOF
      */
     virtual RC next_entry(RID* rid) = 0;
-    virtual RC destroy() = 0;
+    virtual RC destroy()            = 0;
 };

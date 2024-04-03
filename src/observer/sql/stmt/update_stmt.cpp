@@ -27,8 +27,7 @@ UpdateStmt::UpdateStmt(
       value_amount_(value_amount),
       filter_stmt_(filter_stmt),
       attribute_name_(attribute_name)
-{
-}
+{}
 
 RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt)
 {

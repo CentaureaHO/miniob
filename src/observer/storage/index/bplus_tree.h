@@ -54,7 +54,7 @@ class AttrComparator
   public:
     void init(AttrType type, int length)
     {
-        attr_type_ = type;
+        attr_type_   = type;
         attr_length_ = length;
     }
 
@@ -64,20 +64,25 @@ class AttrComparator
     {
         switch (attr_type_)
         {
-            case INTS: {
+            case INTS:
+            {
                 return common::compare_int((void*)v1, (void*)v2);
             }
             break;
-            case FLOATS: {
+            case FLOATS:
+            {
                 return common::compare_float((void*)v1, (void*)v2);
             }
-            case CHARS: {
+            case CHARS:
+            {
                 return common::compare_string((void*)v1, attr_length_, (void*)v2, attr_length_);
             }
-            case DATES: {
+            case DATES:
+            {
                 return common::compare_date((void*)v1, (void*)v2);
             }
-            default: {
+            default:
+            {
                 ASSERT(false, "unknown attr type. %d", attr_type_);
                 return 0;
             }
@@ -124,7 +129,7 @@ class AttrPrinter
   public:
     void init(AttrType type, int length)
     {
-        attr_type_ = type;
+        attr_type_   = type;
         attr_length_ = length;
     }
 
@@ -134,14 +139,17 @@ class AttrPrinter
     {
         switch (attr_type_)
         {
-            case INTS: {
+            case INTS:
+            {
                 return std::to_string(*(int*)v);
             }
             break;
-            case FLOATS: {
+            case FLOATS:
+            {
                 return std::to_string(*(float*)v);
             }
-            case CHARS: {
+            case CHARS:
+            {
                 std::string str;
                 for (int i = 0; i < attr_length_; i++)
                 {
@@ -150,11 +158,13 @@ class AttrPrinter
                 }
                 return str;
             }
-            case DATES: {
+            case DATES:
+            {
                 return std::to_string(*(int*)v);
             }
             break;
-            default: {
+            default:
+            {
                 ASSERT(false, "unknown attr type. %d", attr_type_);
             }
         }
@@ -552,7 +562,7 @@ class BplusTreeHandler
 
   protected:
     DiskBufferPool* disk_buffer_pool_ = nullptr;
-    bool            header_dirty_ = false;  //
+    bool            header_dirty_     = false;  //
     IndexFileHeader file_header_;
 
     // 在调整根节点时，需要加上这个锁。
@@ -615,6 +625,6 @@ class BplusTreeScanner
     Frame* current_frame_ = nullptr;
 
     common::MemPoolItem::unique_ptr right_key_;
-    int                             iter_index_ = -1;
+    int                             iter_index_    = -1;
     bool                            first_emitted_ = false;
 };

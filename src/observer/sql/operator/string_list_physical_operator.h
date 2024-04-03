@@ -51,7 +51,7 @@ class StringListPhysicalOperator : public PhysicalOperator
     {
         if (!started_)
         {
-            started_ = true;
+            started_  = true;
             iterator_ = strings_.begin();
         }
         else if (iterator_ != strings_.end()) { ++iterator_; }
@@ -82,7 +82,7 @@ class StringListPhysicalOperator : public PhysicalOperator
     }
 
   private:
-    using StringList = std::vector<std::string>;
+    using StringList     = std::vector<std::string>;
     using StringListList = std::vector<StringList>;
     StringListList           strings_;
     StringListList::iterator iterator_;

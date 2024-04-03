@@ -54,9 +54,9 @@ class UpdateStmt : public Stmt
      * filter_stmt_: 过滤语句指针
      * attribute_name_: 待更新的属性名
      */
-    Table*      table_ = nullptr;
-    Value*      values_ = nullptr;
+    Table*      table_        = nullptr;
+    Value*      values_       = nullptr;
     int         value_amount_ = 0;
-    FilterStmt* filter_stmt_ = nullptr;
+    FilterStmt* filter_stmt_  = nullptr;
     std::string attribute_name_;
 };

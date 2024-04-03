@@ -79,7 +79,7 @@ RC OptimizeStage::generate_physical_plan(
     unique_ptr<LogicalOperator>& logical_operator, unique_ptr<PhysicalOperator>& physical_operator)
 {
     RC rc = RC::SUCCESS;
-    rc = physical_plan_generator_.create(*logical_operator, physical_operator);
+    rc    = physical_plan_generator_.create(*logical_operator, physical_operator);
     if (rc != RC::SUCCESS) { LOG_WARN("failed to create physical operator. rc=%s", strrc(rc)); }
     return rc;
 }
@@ -91,7 +91,7 @@ RC OptimizeStage::rewrite(unique_ptr<LogicalOperator>& logical_operator)
     bool change_made = false;
     do {
         change_made = false;
-        rc = rewriter_.rewrite(logical_operator, change_made);
+        rc          = rewriter_.rewrite(logical_operator, change_made);
         if (rc != RC::SUCCESS)
         {
             LOG_WARN("failed to do expression rewrite on logical plan. rc=%s", strrc(rc));

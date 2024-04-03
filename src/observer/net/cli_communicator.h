@@ -25,7 +25,7 @@ See the Mulan PSL v2 for more details. */
 class CliCommunicator : public PlainCommunicator
 {
   public:
-    CliCommunicator() = default;
+    CliCommunicator()          = default;
     virtual ~CliCommunicator() = default;
 
     RC init(int fd, Session* session, const std::string& addr) override;

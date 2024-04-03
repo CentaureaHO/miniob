@@ -19,7 +19,7 @@ See the Mulan PSL v2 for more details. */
 
 LatchMemoItem::LatchMemoItem(LatchMemoType type, Frame* frame)
 {
-    this->type = type;
+    this->type  = type;
     this->frame = frame;
 }
 
@@ -66,15 +66,18 @@ void LatchMemo::latch(Frame* frame, LatchMemoType type)
 {
     switch (type)
     {
-        case LatchMemoType::EXCLUSIVE: {
+        case LatchMemoType::EXCLUSIVE:
+        {
             frame->write_latch();
         }
         break;
-        case LatchMemoType::SHARED: {
+        case LatchMemoType::SHARED:
+        {
             frame->read_latch();
         }
         break;
-        default: {
+        default:
+        {
             ASSERT(false, "invalid latch type: %d", static_cast<int>(type));
         }
     }
@@ -110,7 +113,8 @@ void LatchMemo::release_item(LatchMemoItem& item)
 {
     switch (item.type)
     {
-        case LatchMemoType::EXCLUSIVE: {
+        case LatchMemoType::EXCLUSIVE:
+        {
             if (item.frame != nullptr) { item.frame->write_unlatch(); }
             else
             {
@@ -119,17 +123,20 @@ void LatchMemo::release_item(LatchMemoItem& item)
             }
         }
         break;
-        case LatchMemoType::SHARED: {
+        case LatchMemoType::SHARED:
+        {
             if (item.frame != nullptr) { item.frame->read_unlatch(); }
             else { item.lock->unlock_shared(); }
         }
         break;
-        case LatchMemoType::PIN: {
+        case LatchMemoType::PIN:
+        {
             buffer_pool_->unpin_page(item.frame);
         }
         break;
 
-        default: {
+        default:
+        {
             ASSERT(false, "invalid latch type: %d", static_cast<int>(item.type));
         }
     }

@@ -29,7 +29,7 @@ See the Mulan PSL v2 for more details. */
 class TrxBeginExecutor
 {
   public:
-    TrxBeginExecutor() = default;
+    TrxBeginExecutor()          = default;
     virtual ~TrxBeginExecutor() = default;
 
     RC execute(SQLStageEvent* sql_event)
@@ -37,7 +37,7 @@ class TrxBeginExecutor
         SessionEvent* session_event = sql_event->session_event();
 
         Session* session = session_event->session();
-        Trx*     trx = session->current_trx();
+        Trx*     trx     = session->current_trx();
 
         session->set_trx_multi_operation_mode(true);
 

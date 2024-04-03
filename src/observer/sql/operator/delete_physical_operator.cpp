@@ -24,7 +24,7 @@ RC DeletePhysicalOperator::open(Trx* trx)
     if (children_.empty()) { return RC::SUCCESS; }
 
     std::unique_ptr<PhysicalOperator>& child = children_[0];
-    RC                                 rc = child->open(trx);
+    RC                                 rc    = child->open(trx);
     if (rc != RC::SUCCESS)
     {
         LOG_WARN("failed to open child operator: %s", strrc(rc));
@@ -52,8 +52,8 @@ RC DeletePhysicalOperator::next()
         }
 
         RowTuple* row_tuple = static_cast<RowTuple*>(tuple);
-        Record&   record = row_tuple->record();
-        rc = trx_->delete_record(table_, record);
+        Record&   record    = row_tuple->record();
+        rc                  = trx_->delete_record(table_, record);
         if (rc != RC::SUCCESS)
         {
             LOG_WARN("failed to delete record: %s", strrc(rc));

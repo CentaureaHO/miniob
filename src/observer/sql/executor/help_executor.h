@@ -28,7 +28,7 @@ See the Mulan PSL v2 for more details. */
 class HelpExecutor
 {
   public:
-    HelpExecutor() = default;
+    HelpExecutor()          = default;
     virtual ~HelpExecutor() = default;
 
     RC execute(SQLStageEvent* sql_event)

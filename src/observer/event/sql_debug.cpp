@@ -37,7 +37,7 @@ void sql_debug(const char* fmt, ...)
     SqlDebug& sql_debug = request->sql_debug();
 
     const int buffer_size = 4096;
-    char*     str = new char[buffer_size];
+    char*     str         = new char[buffer_size];
 
     va_list ap;
     va_start(ap, fmt);

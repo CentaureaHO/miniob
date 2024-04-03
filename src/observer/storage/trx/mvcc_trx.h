@@ -101,8 +101,8 @@ class MvccTrx : public Trx
     using OperationSet = std::unordered_set<Operation, OperationHasher, OperationEqualer>;
     MvccTrxKit&  trx_kit_;
     CLogManager* log_manager_ = nullptr;
-    int32_t      trx_id_ = -1;
-    bool         started_ = false;
-    bool         recovering_ = false;
+    int32_t      trx_id_      = -1;
+    bool         started_     = false;
+    bool         recovering_  = false;
     OperationSet operations_;
 };

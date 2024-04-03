@@ -25,7 +25,7 @@ class DiskBufferPool;
 
 namespace common
 {
-    class SharedMutex;
+class SharedMutex;
 }
 
 enum class LatchMemoType
@@ -42,9 +42,9 @@ struct LatchMemoItem
     LatchMemoItem(LatchMemoType type, Frame* frame);
     LatchMemoItem(LatchMemoType type, common::SharedMutex* lock);
 
-    LatchMemoType        type = LatchMemoType::NONE;
+    LatchMemoType        type  = LatchMemoType::NONE;
     Frame*               frame = nullptr;
-    common::SharedMutex* lock = nullptr;
+    common::SharedMutex* lock  = nullptr;
 };
 
 class LatchMemo final

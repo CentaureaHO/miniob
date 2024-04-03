@@ -27,7 +27,7 @@ class ServerParam
     ServerParam();
 
     ServerParam(const ServerParam& other) = default;
-    ~ServerParam() = default;
+    ~ServerParam()                        = default;
 
   public:
     // accpet client's address, default is INADDR_ANY, means accept every address

@@ -22,7 +22,7 @@ See the Mulan PSL v2 for more details. */
 class VacuousTrxKit : public TrxKit
 {
   public:
-    VacuousTrxKit() = default;
+    VacuousTrxKit()          = default;
     virtual ~VacuousTrxKit() = default;
 
     RC                            init() override;
@@ -38,7 +38,7 @@ class VacuousTrxKit : public TrxKit
 class VacuousTrx : public Trx
 {
   public:
-    VacuousTrx() = default;
+    VacuousTrx()          = default;
     virtual ~VacuousTrx() = default;
 
     RC insert_record(Table* table, Record& record) override;

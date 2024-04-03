@@ -23,11 +23,11 @@ using namespace common;
 
 RC LoadDataExecutor::execute(SQLStageEvent* sql_event)
 {
-    RC            rc = RC::SUCCESS;
+    RC            rc         = RC::SUCCESS;
     SqlResult*    sql_result = sql_event->session_event()->sql_result();
-    LoadDataStmt* stmt = static_cast<LoadDataStmt*>(sql_event->stmt());
-    Table*        table = stmt->table();
-    const char*   file_name = stmt->filename();
+    LoadDataStmt* stmt       = static_cast<LoadDataStmt*>(sql_event->stmt());
+    Table*        table      = stmt->table();
+    const char*   file_name  = stmt->filename();
     load_data(table, file_name, sql_result);
     return rc;
 }
@@ -44,7 +44,7 @@ RC insert_record_from_file(
     Table* table, std::vector<std::string>& file_values, std::vector<Value>& record_values, std::stringstream& errmsg)
 {
 
-    const int field_num = record_values.size();
+    const int field_num     = record_values.size();
     const int sys_field_num = table->table_meta().sys_field_num();
 
     if (file_values.size() < record_values.size()) { return RC::SCHEMA_FIELD_MISSING; }
@@ -61,7 +61,8 @@ RC insert_record_from_file(
 
         switch (field->type())
         {
-            case INTS: {
+            case INTS:
+            {
                 deserialize_stream.clear();  // 清理stream的状态，防止多次解析出现异常
                 deserialize_stream.str(file_value);
 
@@ -77,7 +78,8 @@ RC insert_record_from_file(
             }
 
             break;
-            case FLOATS: {
+            case FLOATS:
+            {
                 deserialize_stream.clear();
                 deserialize_stream.str(file_value);
 
@@ -91,11 +93,13 @@ RC insert_record_from_file(
                 else { record_values[i].set_float(float_value); }
             }
             break;
-            case CHARS: {
+            case CHARS:
+            {
                 record_values[i].set_string(file_value.c_str());
             }
             break;
-            default: {
+            default:
+            {
                 errmsg << "Unsupported field type to loading: " << field->type();
                 rc = RC::SCHEMA_FIELD_TYPE_MISMATCH;
             }
@@ -130,15 +134,15 @@ void LoadDataExecutor::load_data(Table* table, const char* file_name, SqlResult*
     struct timespec begin_time;
     clock_gettime(CLOCK_MONOTONIC, &begin_time);
     const int sys_field_num = table->table_meta().sys_field_num();
-    const int field_num = table->table_meta().field_num() - sys_field_num;
+    const int field_num     = table->table_meta().field_num() - sys_field_num;
 
     std::vector<Value>       record_values(field_num);
     std::string              line;
     std::vector<std::string> file_values;
     const std::string        delim("|");
-    int                      line_num = 0;
+    int                      line_num        = 0;
     int                      insertion_count = 0;
-    RC                       rc = RC::SUCCESS;
+    RC                       rc              = RC::SUCCESS;
     while (!fs.eof() && RC::SUCCESS == rc)
     {
         std::getline(fs, line);

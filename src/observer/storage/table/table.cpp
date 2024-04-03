@@ -113,8 +113,8 @@ RC Table::create(int32_t table_id, const char* path, const char* name, const cha
     fs.close();
 
     std::string        data_file = table_data_file(base_dir, name);
-    BufferPoolManager& bpm = BufferPoolManager::instance();
-    rc = bpm.create_file(data_file.c_str());
+    BufferPoolManager& bpm       = BufferPoolManager::instance();
+    rc                           = bpm.create_file(data_file.c_str());
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("Failed to create disk buffer pool of data file. file name=%s", data_file.c_str());
@@ -216,9 +216,9 @@ RC Table::open(const char* meta_file, const char* base_dir)
             return RC::INTERNAL;
         }
 
-        BplusTreeIndex* index = new BplusTreeIndex();
+        BplusTreeIndex* index      = new BplusTreeIndex();
         std::string     index_file = table_index_file(base_dir, name(), index_meta->name());
-        rc = index->open(index_file.c_str(), *index_meta, *field_meta);
+        rc                         = index->open(index_file.c_str(), *index_meta, *field_meta);
         if (rc != RC::SUCCESS)
         {
             delete index;
@@ -237,7 +237,7 @@ RC Table::open(const char* meta_file, const char* base_dir)
 RC Table::insert_record(Record& record)
 {
     RC rc = RC::SUCCESS;
-    rc = record_handler_->insert_record(record.data(), table_meta_.record_size(), &record.rid());
+    rc    = record_handler_->insert_record(record.data(), table_meta_.record_size(), &record.rid());
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("Insert record failed. table name=%s, rc=%s", table_meta_.name(), strrc(rc));
@@ -293,7 +293,7 @@ RC Table::get_record(const RID& rid, Record& record)
 RC Table::update_record(Record& record, Value& value, int offset)
 {
     RC rc = RC::SUCCESS;
-    rc = record_handler_->update_record(offset, value, &record.rid());
+    rc    = record_handler_->update_record(offset, value, &record.rid());
     if (rc != RC::SUCCESS) { LOG_ERROR("Update record failed. table name=%s, rc=%s", table_meta_.name(), strrc(rc)); }
     return rc;
 }
@@ -301,7 +301,7 @@ RC Table::update_record(Record& record, Value& value, int offset)
 RC Table::recover_insert_record(Record& record)
 {
     RC rc = RC::SUCCESS;
-    rc = record_handler_->recover_insert_record(record.data(), table_meta_.record_size(), record.rid());
+    rc    = record_handler_->recover_insert_record(record.data(), table_meta_.record_size(), record.rid());
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("Insert record failed. table name=%s, rc=%s", table_meta_.name(), strrc(rc));
@@ -359,8 +359,8 @@ RC Table::make_record(int value_num, const Value* values, Record& record)
 
     for (int i = 0; i < value_num; i++)
     {
-        const FieldMeta* field = table_meta_.field(i + normal_field_start_index);
-        const Value&     value = values[i];
+        const FieldMeta* field    = table_meta_.field(i + normal_field_start_index);
+        const Value&     value    = values[i];
         size_t           copy_len = field->len();
         if (field->type() == CHARS)
         {
@@ -386,7 +386,7 @@ RC Table::init_record_handler(const char* base_dir)
     }
 
     record_handler_ = new RecordFileHandler();
-    rc = record_handler_->init(data_buffer_pool_);
+    rc              = record_handler_->init(data_buffer_pool_);
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("Failed to init record handler. rc=%s", strrc(rc));
@@ -425,9 +425,9 @@ RC Table::create_index(Trx* trx, const FieldMeta* field_meta, const char* index_
     }
 
     // 创建索引相关数据
-    BplusTreeIndex* index = new BplusTreeIndex();
+    BplusTreeIndex* index      = new BplusTreeIndex();
     std::string     index_file = table_index_file(base_dir_.c_str(), name(), index_name);
-    rc = index->create(index_file.c_str(), new_index_meta, *field_meta);
+    rc                         = index->create(index_file.c_str(), new_index_meta, *field_meta);
     if (rc != RC::SUCCESS)
     {
         delete index;
@@ -497,7 +497,7 @@ RC Table::create_index(Trx* trx, const FieldMeta* field_meta, const char* index_
 
     // 覆盖原始元数据文件
     std::string meta_file = table_meta_file(base_dir_.c_str(), name());
-    int         ret = rename(tmp_file.c_str(), meta_file.c_str());
+    int         ret       = rename(tmp_file.c_str(), meta_file.c_str());
     if (ret != 0)
     {
         LOG_ERROR("Failed to rename tmp meta file (%s) to normal meta file (%s) while creating index (%s) on table (%s). "

@@ -39,36 +39,29 @@ RC AggregationOperator::init(AggregationType type)
     return RC::SUCCESS;
 }
 
-RC AggregationOperator::run(std::vector<Value>& values, const char* field_name) 
+RC AggregationOperator::run(std::vector<Value>& values, const char* field_name)
 {
-    if (values.empty()) 
+    if (values.empty())
     {
         LOG_INFO("No values to aggregate for field %s", field_name);
         return RC::EMPTY;
     }
 
-    switch (func_type_) 
+    switch (func_type_)
     {
-        case F_AVG:
-            return Run_AVG(values);
+        case F_AVG: return Run_AVG(values);
         case F_COUNT:
-        case F_COUNT_ALL:
-            return Run_COUNT(values);
-        case F_MAX:
-            return Run_MAX(values);
-        case F_MIN:
-            return Run_MIN(values);
-        case F_SUM:
-            return Run_SUM(values);
-        default:
-            LOG_INFO("Unsupported aggregation function: %s", func_name_.c_str());
-            return RC::AGGREGATION_UNMATCHED;
+        case F_COUNT_ALL: return Run_COUNT(values);
+        case F_MAX: return Run_MAX(values);
+        case F_MIN: return Run_MIN(values);
+        case F_SUM: return Run_SUM(values);
+        default: LOG_INFO("Unsupported aggregation function: %s", func_name_.c_str()); return RC::AGGREGATION_UNMATCHED;
     }
 }
 
 RC AggregationOperator::Run_AVG(std::vector<Value>& values) const
 {
-    double Sum = 0;
+    double   Sum       = 0;
     AttrType ValueType = UNDEFINED;
     for (auto& value : values)
     {
@@ -87,7 +80,7 @@ RC AggregationOperator::Run_AVG(std::vector<Value>& values) const
     return RC::SUCCESS;
 }
 
-RC AggregationOperator::Run_COUNT(std::vector<Value>& values) const 
+RC AggregationOperator::Run_COUNT(std::vector<Value>& values) const
 {
     values[0].set_int(values.size());
     values.erase(values.begin() + 1, values.end());
@@ -98,8 +91,7 @@ RC AggregationOperator::Run_MAX(std::vector<Value>& values) const
 {
     Value* MaxValue = &values[0];
     for (auto& value : values)
-        if (MaxValue->compare(value) < 0)
-            MaxValue = &value;
+        if (MaxValue->compare(value) < 0) MaxValue = &value;
     values[0].set_value(*MaxValue);
     values.erase(values.begin() + 1, values.end());
     return RC::SUCCESS;
@@ -109,8 +101,7 @@ RC AggregationOperator::Run_MIN(std::vector<Value>& values) const
 {
     Value* MinValue = &values[0];
     for (auto& value : values)
-        if (MinValue->compare(value) > 0)
-            MinValue = &value;
+        if (MinValue->compare(value) > 0) MinValue = &value;
     values[0].set_value(*MinValue);
     values.erase(values.begin() + 1, values.end());
     return RC::SUCCESS;
@@ -118,7 +109,7 @@ RC AggregationOperator::Run_MIN(std::vector<Value>& values) const
 
 RC AggregationOperator::Run_SUM(std::vector<Value>& values) const
 {
-    double Sum = 0;
+    double   Sum       = 0;
     AttrType ValueType = UNDEFINED;
     for (auto& value : values)
     {

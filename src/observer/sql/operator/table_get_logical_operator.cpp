@@ -16,8 +16,7 @@ See the Mulan PSL v2 for more details. */
 
 TableGetLogicalOperator::TableGetLogicalOperator(Table* table, const std::vector<Field>& fields, bool readonly)
     : table_(table), fields_(fields), readonly_(readonly)
-{
-}
+{}
 
 void TableGetLogicalOperator::set_predicates(std::vector<std::unique_ptr<Expression>>&& exprs)
 {

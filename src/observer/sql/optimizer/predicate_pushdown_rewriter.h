@@ -25,7 +25,7 @@ See the Mulan PSL v2 for more details. */
 class PredicatePushdownRewriter : public RewriteRule
 {
   public:
-    PredicatePushdownRewriter() = default;
+    PredicatePushdownRewriter()          = default;
     virtual ~PredicatePushdownRewriter() = default;
 
     RC rewrite(std::unique_ptr<LogicalOperator>& oper, bool& change_made) override;

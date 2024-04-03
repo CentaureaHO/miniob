@@ -146,7 +146,7 @@ RC BPFrameManager::free(int file_desc, PageNum page_num, Frame* frame)
 RC BPFrameManager::free_internal(const FrameId& frame_id, Frame* frame)
 {
     Frame*                frame_source = nullptr;
-    [[maybe_unused]] bool found = frames_.get(frame_id, frame_source);
+    [[maybe_unused]] bool found        = frames_.get(frame_id, frame_source);
     ASSERT(found && frame == frame_source && frame->pin_count() == 1,
         "failed to free frame. found=%d, frameId=%s, frame_source=%p, frame=%p, pinCount=%d, lbt=%s",
         found,
@@ -208,8 +208,7 @@ RC BufferPoolIterator::reset()
 ////////////////////////////////////////////////////////////////////////////////
 DiskBufferPool::DiskBufferPool(BufferPoolManager& bp_manager, BPFrameManager& frame_manager)
     : bp_manager_(bp_manager), frame_manager_(frame_manager)
-{
-}
+{}
 
 DiskBufferPool::~DiskBufferPool()
 {
@@ -231,7 +230,7 @@ RC DiskBufferPool::open_file(const char* file_name)
     file_desc_ = fd;
 
     RC rc = RC::SUCCESS;
-    rc = allocate_frame(BP_HEADER_PAGE, &hdr_frame_);
+    rc    = allocate_frame(BP_HEADER_PAGE, &hdr_frame_);
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("failed to allocate frame for header. file name %s", file_name_.c_str());
@@ -290,7 +289,7 @@ RC DiskBufferPool::close_file()
 
 RC DiskBufferPool::get_this_page(PageNum page_num, Frame** frame)
 {
-    RC rc = RC::SUCCESS;
+    RC rc  = RC::SUCCESS;
     *frame = nullptr;
 
     Frame* used_match_frame = frame_manager_.get(file_desc_, page_num);
@@ -305,7 +304,7 @@ RC DiskBufferPool::get_this_page(PageNum page_num, Frame** frame)
 
     // Allocate one page and load the data into this page
     Frame* allocated_frame = nullptr;
-    rc = allocate_frame(page_num, &allocated_frame);
+    rc                     = allocate_frame(page_num, &allocated_frame);
     if (rc != RC::SUCCESS)
     {
         LOG_ERROR("Failed to alloc frame %s:%d, due to failed to alloc page.", file_name_.c_str(), page_num);
@@ -340,7 +339,7 @@ RC DiskBufferPool::allocate_page(Frame** frame)
         for (int i = 0; i < file_header_->page_count; i++)
         {
             byte = i / 8;
-            bit = i % 8;
+            bit  = i % 8;
             if (((file_header_->bitmap[byte]) & (1 << bit)) == 0)
             {
                 (file_header_->allocated_pages)++;
@@ -362,7 +361,7 @@ RC DiskBufferPool::allocate_page(Frame** frame)
         return RC::BUFFERPOOL_NOBUF;
     }
 
-    PageNum page_num = file_header_->page_count;
+    PageNum page_num        = file_header_->page_count;
     Frame*  allocated_frame = nullptr;
     if ((rc = allocate_frame(page_num, &allocated_frame)) != RC::SUCCESS)
     {
@@ -378,7 +377,7 @@ RC DiskBufferPool::allocate_page(Frame** frame)
     file_header_->page_count++;
 
     byte = page_num / 8;
-    bit = page_num % 8;
+    bit  = page_num % 8;
     file_header_->bitmap[byte] |= (1 << bit);
     hdr_frame_->mark_dirty();
 
@@ -510,7 +509,7 @@ RC DiskBufferPool::flush_page_internal(Frame& frame)
     // The better way is use mmap the block into memory,
     // so it is easier to flush data to file.
 
-    Page&   page = frame.page();
+    Page&   page   = frame.page();
     int64_t offset = ((int64_t)page.page_num) * sizeof(Page);
     if (lseek(file_desc_, offset, SEEK_SET) == offset - 1)
     {
@@ -548,7 +547,7 @@ RC DiskBufferPool::recover_page(PageNum page_num)
 {
     int byte = 0, bit = 0;
     byte = page_num / 8;
-    bit = page_num % 8;
+    bit  = page_num % 8;
 
     std::scoped_lock lock_guard(lock_);
     if (!(file_header_->bitmap[byte] & (1 << bit)))
@@ -618,7 +617,7 @@ RC DiskBufferPool::load_page(PageNum page_num, Frame* frame)
     }
 
     Page& page = frame->page();
-    int   ret = readn(file_desc_, &page, BP_PAGE_SIZE);
+    int   ret  = readn(file_desc_, &page, BP_PAGE_SIZE);
     if (ret != 0)
     {
         LOG_ERROR("Failed to load page %s, file_desc:%d, page num:%d, due to failed to read data:%s, ret=%d, page count=%d",
@@ -671,9 +670,9 @@ RC BufferPoolManager::create_file(const char* file_name)
     Page page;
     memset(&page, 0, BP_PAGE_SIZE);
 
-    BPFileHeader* file_header = (BPFileHeader*)page.data;
+    BPFileHeader* file_header    = (BPFileHeader*)page.data;
     file_header->allocated_pages = 1;
-    file_header->page_count = 1;
+    file_header->page_count      = 1;
 
     char* bitmap = file_header->bitmap;
     bitmap[0] |= 0x01;

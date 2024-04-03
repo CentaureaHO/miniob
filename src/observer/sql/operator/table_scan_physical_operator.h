@@ -47,8 +47,8 @@ class TableScanPhysicalOperator : public PhysicalOperator
     RC filter(RowTuple& tuple, bool& result);
 
   private:
-    Table*                                   table_ = nullptr;
-    Trx*                                     trx_ = nullptr;
+    Table*                                   table_    = nullptr;
+    Trx*                                     trx_      = nullptr;
     bool                                     readonly_ = false;
     RecordFileScanner                        record_scanner_;
     Record                                   current_record_;

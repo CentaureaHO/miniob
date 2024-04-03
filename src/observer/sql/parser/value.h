@@ -50,7 +50,7 @@ class Value
     explicit Value(const char* s, int len = 0);
     explicit Value(const char* date, int len, int flag);
 
-    Value(const Value& other) = default;
+    Value(const Value& other)            = default;
     Value& operator=(const Value& other) = default;
 
     void set_type(AttrType type) { this->attr_type_ = type; }
@@ -86,7 +86,7 @@ class Value
 
   private:
     AttrType attr_type_ = UNDEFINED;
-    int      length_ = 0;
+    int      length_    = 0;
 
     union
     {

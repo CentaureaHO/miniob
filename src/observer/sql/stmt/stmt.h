@@ -80,7 +80,7 @@ inline const char* stmt_type_name(StmtType type)
 class Stmt
 {
   public:
-    Stmt() = default;
+    Stmt()          = default;
     virtual ~Stmt() = default;
 
     virtual StmtType type() const = 0;

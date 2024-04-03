@@ -84,7 +84,7 @@ class Communicator
     struct event    read_event_;
     std::string     addr_;
     BufferedWriter* writer_ = nullptr;
-    int             fd_ = -1;
+    int             fd_     = -1;
 };
 
 /**

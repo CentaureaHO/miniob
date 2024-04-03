@@ -21,8 +21,7 @@ using namespace std;
 
 InsertPhysicalOperator::InsertPhysicalOperator(Table* table, vector<Value>&& values)
     : table_(table), values_(std::move(values))
-{
-}
+{}
 
 RC InsertPhysicalOperator::open(Trx* trx)
 {

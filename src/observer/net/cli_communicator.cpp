@@ -30,7 +30,7 @@ See the Mulan PSL v2 for more details. */
 using namespace common;
 
 #ifdef USE_READLINE
-const std::string HISTORY_FILE = std::string(getenv("HOME")) + "/.miniob.history";
+const std::string HISTORY_FILE            = std::string(getenv("HOME")) + "/.miniob.history";
 time_t            last_history_write_time = 0;
 
 char* my_readline(const char* prompt)
@@ -86,7 +86,7 @@ bool is_exit_command(const char* cmd)
 
 char* read_command()
 {
-    const char* prompt_str = "miniob > ";
+    const char* prompt_str    = "miniob > ";
     char*       input_command = nullptr;
     for (input_command = my_readline(prompt_str); common::is_blank(input_command);
          input_command = my_readline(prompt_str))
@@ -127,7 +127,7 @@ RC CliCommunicator::init(int fd, Session* session, const std::string& addr)
 
 RC CliCommunicator::read_event(SessionEvent*& event)
 {
-    event = nullptr;
+    event         = nullptr;
     char* command = read_command();
 
     if (is_exit_command(command))
@@ -146,7 +146,7 @@ RC CliCommunicator::read_event(SessionEvent*& event)
 
 RC CliCommunicator::write_result(SessionEvent* event, bool& need_disconnect)
 {
-    RC rc = PlainCommunicator::write_result(event, need_disconnect);
+    RC rc           = PlainCommunicator::write_result(event, need_disconnect);
     need_disconnect = false;
     return rc;
 }

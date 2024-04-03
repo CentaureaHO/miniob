@@ -110,6 +110,6 @@ class Table
     std::string         base_dir_;
     TableMeta           table_meta_;
     DiskBufferPool*     data_buffer_pool_ = nullptr;  /// 数据文件关联的buffer pool
-    RecordFileHandler*  record_handler_ = nullptr;    /// 记录操作
+    RecordFileHandler*  record_handler_   = nullptr;  /// 记录操作
     std::vector<Index*> indexes_;
 };

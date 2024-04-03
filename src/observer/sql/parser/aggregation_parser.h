@@ -15,5 +15,5 @@ enum AggregationType
     UNKNOWN,
 };
 
-extern const char* aggregation_type_to_string(AggregationType type);
+extern const char*     aggregation_type_to_string(AggregationType type);
 extern AggregationType aggregation_type_from_string(const char* s);

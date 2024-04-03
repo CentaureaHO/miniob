@@ -87,10 +87,10 @@ CLogType clog_type_from_integer(int32_t value);
  */
 struct CLogRecordHeader
 {
-    int32_t lsn_ = -1;                                      ///< log sequence number。当前没有使用
-    int32_t trx_id_ = -1;                                   ///< 日志所属事务的编号
-    int32_t type_ = clog_type_to_integer(CLogType::ERROR);  ///< 日志类型
-    int32_t logrec_len_ = 0;                                ///< record的长度，不包含header长度
+    int32_t lsn_        = -1;                                     ///< log sequence number。当前没有使用
+    int32_t trx_id_     = -1;                                     ///< 日志所属事务的编号
+    int32_t type_       = clog_type_to_integer(CLogType::ERROR);  ///< 日志类型
+    int32_t logrec_len_ = 0;                                      ///< record的长度，不包含header长度
 
     bool operator==(const CLogRecordHeader& other) const
     {
@@ -125,8 +125,8 @@ struct CLogRecordData
     int32_t table_id_ = -1;  ///< 操作的表
     RID     rid_;            ///< 操作的哪条记录
     int32_t data_len_ = 0;   ///< 记录的数据长度(因为header中也包含长度信息，这个长度可以不要)
-    int32_t data_offset_ = 0;  ///< 操作的数据在完整记录中的偏移量
-    char*   data_ = nullptr;   ///< 具体的数据，可能没有任何数据
+    int32_t data_offset_ = 0;        ///< 操作的数据在完整记录中的偏移量
+    char*   data_        = nullptr;  ///< 具体的数据，可能没有任何数据
 
     ~CLogRecordData();
 
@@ -311,7 +311,7 @@ class CLogFile
 
   protected:
     std::string filename_;     ///< 日志文件名。总是init函数参数path路径下的clog文件
-    int         fd_ = -1;      ///< 操作的文件描述符
+    int         fd_  = -1;     ///< 操作的文件描述符
     bool        eof_ = false;  ///< 是否已经读取到文件尾
 };
 
@@ -323,7 +323,7 @@ class CLogFile
 class CLogRecordIterator
 {
   public:
-    CLogRecordIterator() = default;
+    CLogRecordIterator()  = default;
     ~CLogRecordIterator() = default;
 
     RC init(CLogFile& log_file);
@@ -333,7 +333,7 @@ class CLogRecordIterator
     const CLogRecord& log_record();
 
   private:
-    CLogFile*   log_file_ = nullptr;
+    CLogFile*   log_file_   = nullptr;
     CLogRecord* log_record_ = nullptr;
 };
 
@@ -403,5 +403,5 @@ class CLogManager
 
   private:
     CLogBuffer* log_buffer_ = nullptr;  ///< 日志缓存。新增日志时先放到内存，也就是这个buffer中
-    CLogFile*   log_file_ = nullptr;    ///< 管理日志，比如读写日志
+    CLogFile*   log_file_   = nullptr;  ///< 管理日志，比如读写日志
 };

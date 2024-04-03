@@ -224,7 +224,7 @@ void Frame::read_unlatch(intptr_t xid)
             lbt());
 
 #if DEBUG
-        auto read_lock_iter = read_lockers_.find(xid);
+        auto read_lock_iter  = read_lockers_.find(xid);
         int  recursive_count = read_lock_iter != read_lockers_.end() ? read_lock_iter->second : 0;
         ASSERT(recursive_count > 0,
             "frame unlock while not holding read lock."
@@ -253,7 +253,7 @@ void Frame::pin()
 {
     std::scoped_lock debug_lock(debug_lock_);
 
-    intptr_t xid = get_default_debug_xid();
+    intptr_t xid       = get_default_debug_xid();
     int      pin_count = ++pin_count_;
 
     LOG_DEBUG("after frame pin. "

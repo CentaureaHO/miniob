@@ -28,7 +28,6 @@ class Expression;
  * @defgroup SQLParser SQL Parser
  */
 
-
 /**
  * @brief 描述一个属性
  * @ingroup SQLParser
@@ -43,9 +42,9 @@ struct RelAttrSqlNode
     std::string aggregation_name;  ///< aggregation type
     bool        ValidAgg;          ///< is agg valid or not
 
-    RelAttrSqlNode(bool valid = 1): aggregation_name("not_func"), ValidAgg(valid) {}
+    RelAttrSqlNode(bool valid = 1) : aggregation_name("not_func"), ValidAgg(valid) {}
 
-    AggregationType aggr_type() const 
+    AggregationType aggr_type() const
     {
         if (attribute_name == "*" && aggregation_name == "count") return F_COUNT_ALL;
         return aggregation_type_from_string(aggregation_name.c_str());

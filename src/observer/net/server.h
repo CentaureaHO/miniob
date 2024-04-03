@@ -83,9 +83,9 @@ class Server
   private:
     volatile bool started_ = false;
 
-    int                server_socket_ = -1;    ///< 监听套接字，是一个描述符
-    struct event_base* event_base_ = nullptr;  ///< libevent对象
-    struct event*      listen_ev_ = nullptr;   ///< libevent监听套接字事件
+    int                server_socket_ = -1;       ///< 监听套接字，是一个描述符
+    struct event_base* event_base_    = nullptr;  ///< libevent对象
+    struct event*      listen_ev_     = nullptr;  ///< libevent监听套接字事件
 
     ServerParam server_param_;  ///< 服务启动参数
 
