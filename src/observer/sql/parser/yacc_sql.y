@@ -528,13 +528,15 @@ rel_attr:
       if ($4 == nullptr) {
         if ($$->aggregation_name != "not_func") {
           $$->aggregation_name = "composite";
-        } else {
+        } 
+        else {
           $$->aggregation_name = $1;
         }
         free($1);
-      } else {
+      } 
+      else {
         $$->attribute_name = "UNKNOWN";
-        $$->aggregation_name = "composite";
+        $$->aggregation_name = "mulattrs";
         $$->ValidAgg = 0;
       }
     }
@@ -554,13 +556,15 @@ rel_attr:
       if ($6 == nullptr) {
         if ($$->aggregation_name != "not_func") {
           $$->aggregation_name = "composite";
-        } else {
+        } 
+        else {
           $$->aggregation_name = $3;
         }
         free($3);
-      } else {
+      } 
+      else {
         $$->attribute_name = "UNKNOWN";
-        $$->aggregation_name = "composite"; // Similarly, set to "composite" for complex cases
+        $$->aggregation_name = "mulattrs";
         $$->ValidAgg = 0;
       }
       free($1);
