@@ -518,17 +518,12 @@ rel_attr:
       $$ = new RelAttrSqlNode;
       $$->attribute_name = "*";
     }
+
+    // Single table query
     | ID {
       $$ = new RelAttrSqlNode;
       $$->attribute_name = $1;
       free($1);
-    }
-    | ID DOT ID {
-      $$ = new RelAttrSqlNode;
-      $$->relation_name  = $1;
-      $$->attribute_name = $3;
-      free($1);
-      free($3);
     }
     | ID LBRACE rel_attr attr_list RBRACE {
       $$ = $3;
@@ -545,6 +540,34 @@ rel_attr:
       }
     }
     | ID LBRACE RBRACE {
+      $$ = new RelAttrSqlNode(0);
+    }
+
+    // Multi table query
+    | ID DOT ID {
+      $$ = new RelAttrSqlNode;
+      $$->relation_name  = $1;
+      $$->attribute_name = $3;
+      free($1);
+      free($3);
+    }
+    | ID DOT ID LBRACE rel_attr attr_list RBRACE {
+      $$ = $5;
+      $$->relation_name  = $1;
+      if ($6 == nullptr)
+      {
+        $$->aggregation_name = $3;
+        free($3);
+      }
+      else
+      {
+        $$->attribute_name = "UNKNOWN";
+        $$->aggregation_name = "mulattrs";
+        $$->ValidAgg = 0;
+      }
+      free($1);
+    }
+    | ID DOT ID LBRACE RBRACE {
       $$ = new RelAttrSqlNode(0);
     }
     ;
