@@ -7,16 +7,16 @@ AlignAfterOpenBracket: DontAlign
 AlignConsecutiveAssignments: true
 AlignConsecutiveDeclarations: true
 DerivePointerAlignment: false
-PointerAlignment: Right
+PointerAlignment: Left
 ConstructorInitializerIndentWidth: 4
 AlignEscapedNewlinesLeft: true
 AlignTrailingComments: true
 AllowAllParametersOfDeclarationOnNextLine: true
 AllowShortBlocksOnASingleLine: true
 AllowShortFunctionsOnASingleLine: true
-AllowShortIfStatementsOnASingleLine: false
+AllowShortIfStatementsOnASingleLine: true
 AllowShortCaseLabelsOnASingleLine: true
-AllowShortLoopsOnASingleLine: false
+AllowShortLoopsOnASingleLine: true
 AlwaysBreakTemplateDeclarations: true
 # false表示函数实参要么都在同一行，要么都各自一行
 BinPackArguments: false
@@ -33,7 +33,7 @@ DerivePointerBinding: true
 ExperimentalAutoDetectBinPacking: false
 IndentCaseLabels: true
 MaxEmptyLinesToKeep: 1
-NamespaceIndentation: None
+NamespaceIndentation: All
 ObjCSpaceBeforeProtocolList: false
 PenaltyBreakBeforeFirstCallParameter: 19
 PenaltyBreakComment: 200
@@ -46,26 +46,27 @@ AlwaysBreakAfterReturnType: None
 PointerBindsToType: true
 Cpp11BracedListStyle: true
 Standard:        Auto
-IndentWidth:     2
+IndentWidth:     4
 TabWidth:        4
 UseTab:          Never
 BreakBeforeBraces: Custom
 BraceWrapping:   
   AfterClass:      true
-  AfterControlStatement: false
+  AfterControlStatement: true
   AfterEnum:       true
   AfterFunction:   true
-  AfterNamespace:  false
+  AfterNamespace:  true
   AfterObjCDeclaration: false
   AfterStruct:     true
   AfterUnion:      true
   AfterExternBlock: false
   BeforeCatch:     false
-  BeforeElse:      false
+  BeforeElse:      true
   IndentBraces:    false
   SplitEmptyFunction: false
   SplitEmptyRecord: false
   SplitEmptyNamespace: false
+  AfterCaseLabel: true
 IndentFunctionDeclarationAfterType: true
 SpacesInParentheses: false
 SpacesInAngles: false
