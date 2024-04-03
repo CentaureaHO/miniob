@@ -527,7 +527,9 @@ rel_attr:
       $$ = $3;
       if ($4 == nullptr) {
         if ($$->aggregation_name != "not_func") {
+          $$->attribute_name = "UNKNOWN";
           $$->aggregation_name = "composite";
+          $$->ValidAgg = 0;
         } 
         else {
           $$->aggregation_name = $1;
@@ -555,7 +557,9 @@ rel_attr:
       $$->relation_name  = $1;
       if ($6 == nullptr) {
         if ($$->aggregation_name != "not_func") {
+          $$->attribute_name = "UNKNOWN";
           $$->aggregation_name = "composite";
+          $$->ValidAgg = 0;
         } 
         else {
           $$->aggregation_name = $3;
