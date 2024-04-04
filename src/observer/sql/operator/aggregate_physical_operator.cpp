@@ -50,9 +50,12 @@ RC AggregationPhysicalOperator::next()
     std::vector<Value> resultCells(aggs_.size(), Value());
     for (size_t i = 0; i < aggs_.size(); ++i)
     {
+        // rc = aggregationOps[i].run(aggregatedValues[i], "");
+        // 不知为和，如果以上边的形式运行就会返回empty
         if (aggregationOps[i].run(aggregatedValues[i], "") != RC::SUCCESS)
         {
-            LOG_WARN("failed to run aggregation operator: %s", strrc(rc));
+            // std::cout << "failed to run aggregation operator: " << strrc(rc) << '\n'; 
+            LOG_WARN("failed to run aggregation operator.");
             return rc;
         }
         if (!aggregatedValues[i].empty()) resultCells[i] = aggregatedValues[i][0];

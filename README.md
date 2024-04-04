@@ -20,9 +20,11 @@
 
 2024.04.02: 1. 实现AGGREGATION FUNC的语法规则，及其它工作，顺带提前完成思考题；  
 
-2024.04.02: 1. 完成AGGREGATION FUNC实现；  
+2024.04.03: 1. 完成AGGREGATION FUNC实现；  
             2. 重新格式化；  
             3. 更改部分AGGREGATION细节；  
+
+2024.04.04: 1. 开始实现JOIN TABLE；  
 
 # MiniOB 概述
 
