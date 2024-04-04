@@ -106,6 +106,24 @@ struct SelectSqlNode
 };
 
 /**
+ * @brief 描述一个join语句
+ */
+struct JoinSqlNode
+{
+    std::string                   relation_name;  ///< Relation to join
+    std::vector<ConditionSqlNode> conditions;     ///< Join conditions
+
+    JoinSqlNode(const char* rel_name, const std::vector<ConditionSqlNode>& conds)
+        : relation_name(rel_name), conditions(conds)
+    {}
+};
+
+struct RelationSqlNode {
+  std::string relation_name;
+  std::string alias_name;
+};
+
+/**
  * @brief 算术表达式计算的语法树
  * @ingroup SQLParser
  */

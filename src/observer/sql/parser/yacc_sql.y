@@ -74,6 +74,8 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
         TRX_BEGIN
         TRX_COMMIT
         TRX_ROLLBACK
+        INNER
+        JOIN
 
 
         INT_T
@@ -114,6 +116,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
   AttrInfoSqlNode *                 attr_info;
   Expression *                      expression;
   std::vector<Expression *> *       expression_list;
+  std::vector<JoinSqlNode> *        join_list;
   std::vector<Value> *              value_list;
   std::vector<ConditionSqlNode> *   condition_list;
   std::vector<RelAttrSqlNode> *     rel_attr_list;
@@ -147,6 +150,8 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %type <rel_attr_list>       attr_list
 %type <expression>          expression
 %type <expression_list>     expression_list
+%type <join_list>           inner_join
+%type <join_list>           inner_join_list
 %type <sql_node>            calc_stmt
 %type <sql_node>            select_stmt
 %type <sql_node>            insert_stmt
@@ -447,7 +452,59 @@ select_stmt:        /*  select 语句的语法解析树*/
       }
       free($4);
     }
+| SELECT select_attr FROM ID inner_join inner_join_list where
+    {
+      $$ = new ParsedSqlNode(SCF_SELECT);
+
+      // 设置选择的属性
+      if ($2 != nullptr) {
+        $$->selection.attributes.swap(*$2);
+        delete $2;
+      }
+      
+      // 设置主表名
+      std::string main_table_name = $4;
+      $$->selection.relations.push_back(main_table_name); // 主表加入relations列表
+
+      // 处理inner_join部分
+      if ($5 != nullptr) {
+        // 遍历$5返回的JoinSqlNode列表，添加它们的relation_name到relations
+        for (auto &join_relation : *$5) {
+          $$->selection.relations.push_back(join_relation.relation_name);
+          // 同时，把这个JOIN操作的条件加入到conditions
+          for (auto &condition : join_relation.conditions) {
+            $$->selection.conditions.push_back(condition);
+          }
+        }
+        delete $5; // 释放$5占用的资源
+      }
+
+      // 处理inner_join_list部分
+      if ($6 != nullptr && !$6->empty()) {
+        // 遍历$6返回的JoinSqlNode列表，添加它们的relation_name到relations
+        for (auto &join_relation : *$6) {
+          $$->selection.relations.push_back(join_relation.relation_name);
+          // 同时，把这些JOIN操作的条件加入到conditions
+          for (auto &condition : join_relation.conditions) {
+            $$->selection.conditions.push_back(condition);
+          }
+        }
+        delete $6; // 释放$6占用的资源
+      }
+
+      // 处理WHERE子句
+      if ($7 != nullptr) {
+        // 把WHERE子句的条件加入到conditions
+        for (auto &condition : *$7) {
+          $$->selection.conditions.push_back(condition);
+        }
+        delete $7; // 释放$7占用的资源
+      }
+
+      free($4); // 释放主表名占用的字符串资源
+    }
     ;
+
 calc_stmt:
     CALC expression_list
     {
@@ -498,6 +555,31 @@ expression:
       $$ = new ValueExpr(*$1);
       $$->set_name(token_name(sql_string, &@$));
       delete $1;
+    }
+    ;
+
+inner_join:
+    INNER JOIN ID ON condition_list
+    {
+      $$ = new std::vector<JoinSqlNode>;
+      $$->emplace_back($3, *$5);
+      free($3);
+    }
+    ;
+
+inner_join_list:
+    /* empty */
+    {
+      $$ = nullptr;
+    }
+    | INNER JOIN ID ON condition_list inner_join_list
+    {
+      if ($6 == nullptr) {
+        $6 = new std::vector<JoinSqlNode>;
+      }
+      $6->emplace_back($3, *$5);
+      $$ = $6;
+      free($3);
     }
     ;
 
