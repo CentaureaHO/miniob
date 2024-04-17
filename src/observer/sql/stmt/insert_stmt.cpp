@@ -64,13 +64,13 @@ RC InsertStmt::create(Db* db, const InsertSqlNode& inserts, Stmt*& stmt)
           table_name, field_meta->name(), field_type, value_type);
             return RC::SCHEMA_FIELD_TYPE_MISMATCH;
         }
-        else if (field_type == DATES)
+        else if (field_type == DATES && !common::CheckDate(values[i].get_date()))
         {
-            if (!common::CheckDate(values[i].get_date())) return RC::SCHEMA_FIELD_TYPE_MISMATCH;
+            LOG_WARN("invalid date value");
+            return RC::INVALID_ARGUMENT;
         }
     }
 
-    // everything alright
     stmt = new InsertStmt(table, values, value_num);
     return RC::SUCCESS;
 }
