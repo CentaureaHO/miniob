@@ -95,11 +95,7 @@ void SessionStage::handle_request(StageEvent* event)
     sev->session()->set_current_request(sev);
     SQLStageEvent sql_event(sev, sql);
     RC            rc = handle_sql(&sql_event);
-    if (rc != RC::SUCCESS)
-    {
-        std::cout << "FAILURE\n" << std::endl;
-        return;
-    }
+    sev->sql_result()->set_return_code(rc);
     Communicator* communicator    = sev->get_communicator();
     bool          need_disconnect = false;
     rc                            = communicator->write_result(sev, need_disconnect);
