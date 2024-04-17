@@ -42,7 +42,7 @@ Value::Value(bool val) { set_boolean(val); }
 // Char
 Value::Value(const char* s, int len) { set_string(s, len); }
 // Date
-Value::Value(const char* StrDate, int len, int flag) { set_date(StrDate); }
+Value::Value(const char* StrDate, int len, RC& rc) { set_date(StrDate, rc); }
 
 void Value::set_data(char* data, int length)
 {
@@ -121,10 +121,10 @@ void Value::set_date(int val)
     num_value_.int_value_ = val;
     length_               = sizeof(val);
 }
-void Value::set_date(const char* val)
+void Value::set_date(const char* val, RC& rc)
 {
     int IntDate = 0;
-    common::StrDate2IntDate(val, IntDate);
+    common::StrDate2IntDate(val, IntDate, rc);
     set_date(IntDate);
 }
 void Value::set_value(const Value& value)

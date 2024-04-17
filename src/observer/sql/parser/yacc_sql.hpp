@@ -114,7 +114,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 109 "yacc_sql.y"
+#line 111 "yacc_sql.y"
 
   ParsedSqlNode *                   sql_node;
   ConditionSqlNode *                condition;
@@ -159,7 +159,7 @@ struct YYLTYPE
 
 
 
-int yyparse (const char * sql_string, ParsedSqlResult * sql_result, void * scanner);
+int yyparse (const char * sql_string, ParsedSqlResult * sql_result, void * scanner, RC& rc);
 
 
 #endif /* !YY_YY_YACC_SQL_HPP_INCLUDED  */

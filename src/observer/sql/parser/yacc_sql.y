@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "common/log/log.h"
+#include "common/rc.h"
 #include "common/lang/string.h"
 #include "sql/parser/parse_defs.h"
 #include "sql/parser/yacc_sql.hpp"
@@ -20,7 +21,7 @@ string token_name(const char *sql_string, YYLTYPE *llocp)
   return string(sql_string + llocp->first_column, llocp->last_column - llocp->first_column + 1);
 }
 
-int yyerror(YYLTYPE *llocp, const char *sql_string, ParsedSqlResult *sql_result, yyscan_t scanner, const char *msg)
+int yyerror(YYLTYPE *llocp, const char *sql_string, ParsedSqlResult *sql_result, yyscan_t scanner, RC& rc, const char *msg)
 {
   std::unique_ptr<ParsedSqlNode> error_sql_node = std::make_unique<ParsedSqlNode>(SCF_ERROR);
   error_sql_node->error.error_msg = msg;
@@ -52,6 +53,7 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %parse-param { const char * sql_string }
 %parse-param { ParsedSqlResult * sql_result }
 %parse-param { void * scanner }
+%parse-param { RC& rc }
 
 //标识tokens
 %token  SEMICOLON
@@ -399,7 +401,7 @@ value:
     }
     |DATE_STR {
       char *tmp = common::substr($1,1,strlen($1)-2);
-      $$ = new Value(tmp, strlen(tmp), 1);
+      $$ = new Value(tmp, strlen(tmp), rc);
       free(tmp);
     }
     ;
@@ -817,11 +819,11 @@ opt_semicolon: /*empty*/
 //_____________________________________________________________________
 extern void scan_string(const char *str, yyscan_t scanner);
 
-int sql_parse(const char *s, ParsedSqlResult *sql_result) {
+int sql_parse(const char *s, ParsedSqlResult *sql_result, RC& rc) {
   yyscan_t scanner;
   yylex_init(&scanner);
   scan_string(s, scanner);
-  int result = yyparse(s, sql_result, scanner);
+  int result = yyparse(s, sql_result, scanner, rc);
   yylex_destroy(scanner);
   return result;
 }

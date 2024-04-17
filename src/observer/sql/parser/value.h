@@ -15,6 +15,7 @@ See the Mulan PSL v2 for more details. */
 #pragma once
 
 #include <string>
+#include "common/rc.h"
 
 /**
  * @brief 属性的类型
@@ -48,7 +49,7 @@ class Value
     explicit Value(float val);
     explicit Value(bool val);
     explicit Value(const char* s, int len = 0);
-    explicit Value(const char* date, int len, int flag);
+    explicit Value(const char* date, int len, RC& rc);
 
     Value(const Value& other)            = default;
     Value& operator=(const Value& other) = default;
@@ -61,7 +62,7 @@ class Value
     void set_boolean(bool val);
     void set_string(const char* s, int len = 0);
     void set_date(int val);
-    void set_date(const char* val);
+    void set_date(const char* val, RC& rc);
     void set_value(const Value& value);
 
     std::string to_string() const;

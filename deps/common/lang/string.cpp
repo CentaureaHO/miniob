@@ -175,7 +175,7 @@ namespace common
     char* bin_to_hex(const char* s, const int len, char* hex_buff)
     {
         int            new_len = 0;
-        unsigned char* end = (unsigned char*)s + len;
+        unsigned char* end     = (unsigned char*)s + len;
         for (unsigned char* p = (unsigned char*)s; p < end; p++)
         {
             new_len += snprintf(hex_buff + new_len, 3, "%02x", *p);
@@ -196,14 +196,14 @@ namespace common
         src_len = strlen(s);
         if (src_len == 0)
         {
-            *dest_len = 0;
+            *dest_len   = 0;
             bin_buff[0] = '\0';
             return bin_buff;
         }
 
         *dest_len = src_len / 2;
-        src = (char*)s;
-        buff[2] = '\0';
+        src       = (char*)s;
+        buff[2]   = '\0';
 
         p_dest_end = bin_buff + (*dest_len);
         for (p_dest = bin_buff; p_dest < p_dest_end; p_dest++)
@@ -281,18 +281,19 @@ namespace common
         return m > 0 && m <= 12 && d > 0 && d <= MonthDays[m];
     }
 
-    void StrDate2IntDate(const char* StrDate, int& IntDate)
+    void StrDate2IntDate(const char* StrDate, int& IntDate, RC& rc)
     {
         int Year, Month, Day;
         sscanf(StrDate, "%d-%d-%d", &Year, &Month, &Day);
         if (!IsDateValid(Year, Month, Day))
         {
             IntDate = MinInt;
+            rc      = RC::INVALID_ARGUMENT;
             return;
         }
 
         bool IsBefore1970 = Year < 1970;
-        IntDate = 0;
+        IntDate           = 0;
         if (IsBefore1970)
             for (int y = 1969; y > Year; --y) IntDate -= (IsLeapYear(y) ? 366 : 365);
         else
@@ -325,7 +326,7 @@ namespace common
         }
 
         int MonthDays[] = {31, IsLeapYear(Year) ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
-        int Month = 0;
+        int Month       = 0;
         while (IntDate >= MonthDays[Month])
         {
             IntDate -= MonthDays[Month];

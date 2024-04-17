@@ -27,6 +27,7 @@ See the Mulan PSL v2 for more details. */
 #include "net/server.h"
 #include "net/communicator.h"
 #include "session/session.h"
+#include <iostream>
 
 using namespace common;
 
@@ -93,11 +94,15 @@ void SessionStage::handle_request(StageEvent* event)
     Session::set_current_session(sev->session());
     sev->session()->set_current_request(sev);
     SQLStageEvent sql_event(sev, sql);
-    (void)handle_sql(&sql_event);
-
+    RC            rc = handle_sql(&sql_event);
+    if (rc != RC::SUCCESS)
+    {
+        std::cout << "FAILURE\n" << std::endl;
+        return;
+    }
     Communicator* communicator    = sev->get_communicator();
     bool          need_disconnect = false;
-    RC            rc              = communicator->write_result(sev, need_disconnect);
+    rc                            = communicator->write_result(sev, need_disconnect);
     LOG_INFO("write result return %s", strrc(rc));
     if (need_disconnect) { Server::close_connection(communicator); }
     sev->session()->set_current_request(nullptr);
