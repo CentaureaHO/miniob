@@ -594,6 +594,13 @@ select_attr:
       }
       $$->emplace_back(*$1);
       delete $1;
+      bool HasAgg = 0, HasCommon = 0;
+      for (auto& Node: *$$)
+      {
+        if (Node.aggregation_name == "not_func") HasCommon = 1;
+        else                                     HasAgg    = 1;
+        if (HasCommon && HasAgg) rc = RC::UNKNOWN_AGGREGATION_FUNC;
+      }
     }
     ;
 
@@ -613,21 +620,22 @@ rel_attr:
         if ($$->aggregation_name != "not_func") {
           $$->attribute_name = "UNKNOWN";
           $$->aggregation_name = "composite";
-          $$->ValidAgg = 0;
+          rc = RC::INVALID_ARGUMENT;
         } 
         else {
           $$->aggregation_name = $1;
+          free($1);
         }
-        free($1);
       } 
       else {
         $$->attribute_name = "UNKNOWN";
         $$->aggregation_name = "mulattrs";
-        $$->ValidAgg = 0;
+        rc = RC::NESTED_AGGREGATION;
       }
     }
     | ID LBRACE RBRACE {
-      $$ = new RelAttrSqlNode(0);
+      $$ = new RelAttrSqlNode;
+      rc = RC::AGGREGATION_UNMATCHED;
     }
     | ID DOT ID {
       $$ = new RelAttrSqlNode;
@@ -643,7 +651,7 @@ rel_attr:
         if ($$->aggregation_name != "not_func") {
           $$->attribute_name = "UNKNOWN";
           $$->aggregation_name = "composite";
-          $$->ValidAgg = 0;
+          rc = RC::INVALID_ARGUMENT;
         } 
         else {
           $$->aggregation_name = $3;
@@ -653,12 +661,13 @@ rel_attr:
       else {
         $$->attribute_name = "UNKNOWN";
         $$->aggregation_name = "mulattrs";
-        $$->ValidAgg = 0;
+        rc = RC::NESTED_AGGREGATION;
       }
       free($1);
     }
     | ID DOT ID LBRACE RBRACE {
-      $$ = new RelAttrSqlNode(0);
+      $$ = new RelAttrSqlNode;
+      rc = RC::AGGREGATION_UNMATCHED;
     }
     ;
 
