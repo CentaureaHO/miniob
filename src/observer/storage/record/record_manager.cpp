@@ -286,19 +286,15 @@ RC RecordPageHandler::get_record(const RID* rid, Record* rec)
     return RC::SUCCESS;
 }
 
-RC RecordPageHandler::update_record(int offset, Value& value, RID* rid)
+RC RecordPageHandler::update_record(int Offset, Value& value, RID* rid)
 {
-    // 确保当前页面不是只读的
-    ASSERT(!readonly_, "Cannot update record on a readonly page.");
-
-    // 检查给定的槽号是否超过了页面能容纳的记录上限
+    ASSERT(!readonly_, "Cannot update record from page while the page is readonly.");
     if (rid->slot_num >= page_header_->record_capacity)
     {
         LOG_ERROR("Invalid slot_num %d, exceeds page's record capacity, page_num %d.", rid->slot_num, frame_->page_num());
         return RC::INVALID_ARGUMENT;
     }
 
-    // 使用位图来检查指定槽号的记录是否存在
     Bitmap bitmap(bitmap_, page_header_->record_capacity);
     if (!bitmap.get_bit(rid->slot_num))
     {
@@ -306,12 +302,10 @@ RC RecordPageHandler::update_record(int offset, Value& value, RID* rid)
         return RC::RECORD_NOT_EXIST;
     }
 
-    // 计算出要更新的记录内容的确切位置，将新值复制到计算出的位置
     char* ChangeLoc =
-        frame_->data() + page_header_->first_record_offset + page_header_->record_size * rid->slot_num + offset;
+        frame_->data() + page_header_->first_record_offset + page_header_->record_size * rid->slot_num + Offset;
     memcpy(ChangeLoc, value.data(), value.length());
 
-    // 标记该页面为脏页面，需要写回磁盘
     frame_->mark_dirty();
     return RC::SUCCESS;
 }

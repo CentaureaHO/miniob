@@ -18,56 +18,41 @@ PhysicalOperatorType UpdatePhysicalOperator::type() const { return PhysicalOpera
 
 RC UpdatePhysicalOperator::open(Trx* trx)
 {
-    if (children_.empty()) { return RC::SUCCESS; }
+    if (children_.empty()) return RC::SUCCESS;
 
     std::unique_ptr<PhysicalOperator>& child = children_[0];
     RC                                 rc    = child->open(trx);
     if (rc != RC::SUCCESS)
     {
-        LOG_WARN("failed to open child operator: %s", strrc(rc));
+        LOG_WARN("Failed to open child operator: %s.", strrc(rc));
         return rc;
     }
-
     trx_ = trx;
-
     return RC::SUCCESS;
 }
 
 RC UpdatePhysicalOperator::next()
 {
     RC rc = RC::SUCCESS;
-    if (children_.empty()) { return RC::RECORD_EOF; }
+    if (children_.empty()) return RC::RECORD_EOF;
 
     PhysicalOperator* child = children_[0].get();
     while (RC::SUCCESS == (rc = child->next()))
     {
         Tuple* tuple = child->current_tuple();
-        if (nullptr == tuple)
-        {
-            LOG_WARN("failed to get current record: %s", strrc(rc));
-            return rc;
-        }
+        if (!tuple) return rc;
 
         RowTuple* row_tuple = static_cast<RowTuple*>(tuple);
         Record&   record    = row_tuple->record();
-        if (*field_name_ == 0)
-        {
-            rc = RC::EMPTY;
-            return rc;
-        }
-        const FieldMeta* feildmeta = table_->table_meta().field(field_name_);
-        if (feildmeta == nullptr)
-        {
-            rc = RC::EMPTY;
-            return rc;
-        }
+        if (!(*field_name_)) return RC::EMPTY;
 
-        int offset = feildmeta->offset();
+        const FieldMeta* fieldmeta = table_->table_meta().field(field_name_);
+        if (!fieldmeta) return RC::EMPTY;
 
-        rc = trx_->update_record(table_, record, value_, offset);
+        rc = trx_->update_record(table_, record, value_, fieldmeta->offset());
         if (rc != RC::SUCCESS)
         {
-            LOG_WARN("failed to delete record: %s", strrc(rc));
+            LOG_WARN("Failed to delete record in case: %s.", strrc(rc));
             return rc;
         }
     }
@@ -76,6 +61,6 @@ RC UpdatePhysicalOperator::next()
 
 RC UpdatePhysicalOperator::close()
 {
-    if (!children_.empty()) { children_[0]->close(); }
+    if (!children_.empty()) children_[0]->close();
     return RC::SUCCESS;
 }

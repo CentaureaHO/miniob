@@ -86,6 +86,7 @@ RC LogicalPlanGenerator::create(Stmt* stmt, unique_ptr<LogicalOperator>& logical
             rc                      = create_plan(update_stmt, logical_operator);
         }
         break;
+
         default:
         {
             rc = RC::UNIMPLENMENT;
@@ -245,20 +246,15 @@ RC LogicalPlanGenerator::create_plan(ExplainStmt* explain_stmt, unique_ptr<Logic
 
 RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<LogicalOperator>& logical_operator)
 {
-    // 从更新语句中获取表对象； 通过表对象获取表的元数据; 定义一个字段向量，用于存储表的所有字段
     Table*             table      = update_stmt->table();
     const TableMeta&   table_meta = table->table_meta();
     std::vector<Field> fields;
-
-    // 遍历表的所有字段元数据，并将它们添加到fields向量中
     for (int i = 0; i < table_meta.field_num(); ++i)
     {
         const FieldMeta* field_meta = table_meta.field(i);
         fields.emplace_back(table, field_meta);
     }
-
-    // 创建一个用于获取表数据的逻辑操作符，它将用于执行更新操作之前的数据检索
-    auto table_get_oper = std::make_unique<TableGetLogicalOperator>(table, fields, false /* readonly */);
+    auto table_get_oper = std::make_unique<TableGetLogicalOperator>(table, fields, 0);
 
     unique_ptr<LogicalOperator> filter_oper;
     if (update_stmt->filter_stmt())
@@ -266,23 +262,17 @@ RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<Logical
         RC rc = create_plan(update_stmt->filter_stmt(), filter_oper);
         if (rc != RC::SUCCESS) return rc;
     }
-    // 创建一个逻辑更新操作符，用于执行实际的更新操作
     auto update_oper =
         std::make_unique<UpdateLogicalOperator>(table, *update_stmt->values(), update_stmt->attribute_name().c_str());
 
-    // 如果存在过滤操作符，将获取表数据的操作符设置为过滤操作符的子操作符，
-    // 然后将过滤操作符设置为更新操作符的子操作符。
-    // 这样，数据首先被获取，然后根据过滤条件进行筛选，最后执行更新。
     if (filter_oper)
     {
         filter_oper->add_child(std::move(table_get_oper));
         update_oper->add_child(std::move(filter_oper));
     }
     else
-        // 如果不存在过滤条件，直接将获取表数据的操作符设置为更新操作符的子操作符
         update_oper->add_child(std::move(table_get_oper));
 
-    // 将构建的更新操作符赋值给传入的引用，完成逻辑计划的创建
     logical_operator = std::move(update_oper);
     return RC::SUCCESS;
 }

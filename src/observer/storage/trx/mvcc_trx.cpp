@@ -197,24 +197,19 @@ RC MvccTrx::update_record(Table* table, Record& record, Value& value, int offset
     trx_fields(table, BeginField, EndField);
 
     int ClosedBy = EndField.get_int(record);
-    // 确认记录没有被其他事务关闭，并且是最新版本的记录
     ASSERT(ClosedBy > 0 && ClosedBy == trx_kit_.max_trx_id(),
         "Concurrency conflict or not latest version. Closed by %d, trx_id=%d, rid=%s",
         ClosedBy,
         trx_id_,
         record.rid().to_string().c_str());
 
-    // 调用Table对象的update_record方法更新记录，传入需要更新的值和偏移量
     RC rc = table->update_record(record, value, offset);
     ASSERT(rc == RC::SUCCESS, "Failed to update. rc=%s", strrc(rc));
 
-    // 将结束字段的值设置为当前事务ID的负值
     EndField.set_int(record, -trx_id_);
-    // 追加一条删除记录
     rc = log_manager_->append_log(CLogType::DELETE, trx_id_, table->table_id(), record.rid(), 0, 0, nullptr);
     ASSERT(rc == RC::SUCCESS, "Failed to append delete record log. rc=%s", strrc(rc));
 
-    // 将操作加入到事务的操作列表中
     operations_.insert(Operation(Operation::Type::DELETE, table, record.rid()));
     return RC::SUCCESS;
 }
