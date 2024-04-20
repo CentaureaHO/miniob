@@ -117,9 +117,10 @@ struct JoinSqlNode
     {}
 };
 
-struct RelationSqlNode {
-  std::string relation_name;
-  std::string alias_name;
+struct RelationSqlNode
+{
+    std::string relation_name;
+    std::string alias_name;
 };
 
 /**
@@ -158,11 +159,17 @@ struct DeleteSqlNode
  * @brief 描述一个update语句
  * @ingroup SQLParser
  */
+struct UpdateList
+{
+    std::string attribute_name;
+    Value*      value;
+};
+
 struct UpdateSqlNode
 {
-    std::string                   relation_name;   ///< Relation to update
-    std::string                   attribute_name;  ///< 更新的字段，仅支持一个字段
-    Value                         value;           ///< 更新的值，仅支持一个字段
+    std::string                   relation_name;  ///< Relation to update
+    std::vector<std::string>      attribute_names;
+    std::vector<Value>            values;
     std::vector<ConditionSqlNode> conditions;
 };
 

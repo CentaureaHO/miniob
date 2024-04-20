@@ -13,6 +13,7 @@
 #include "sql/parser/yacc_sql.hpp"
 #include "sql/parser/lex_sql.h"
 #include "sql/expr/expression.h"
+#include <iostream>
 
 using namespace std;
 
@@ -114,6 +115,8 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
   Value *                           value;
   enum CompOp                       comp;
   RelAttrSqlNode *                  rel_attr;
+  UpdateList *                      update_attr;
+  std::vector<UpdateList> *         update_attr_list;
   std::vector<AttrInfoSqlNode> *    attr_infos;
   AttrInfoSqlNode *                 attr_info;
   Expression *                      expression;
@@ -148,6 +151,8 @@ ArithmeticExpr *create_arithmetic_expression(ArithmeticExpr::Type type,
 %type <condition_list>      where
 %type <condition_list>      condition_list
 %type <rel_attr_list>       select_attr
+%type <update_attr>         update_attr
+%type <update_attr_list>    update_attr_list
 %type <relation_list>       rel_list
 %type <rel_attr_list>       attr_list
 %type <expression>          expression
@@ -419,18 +424,25 @@ delete_stmt:    /*  delete 语句的语法解析树*/
     }
     ;
 update_stmt:      /*  update 语句的语法解析树*/
-    UPDATE ID SET ID EQ value where 
+    UPDATE ID SET update_attr update_attr_list where 
     {
       $$ = new ParsedSqlNode(SCF_UPDATE);
       $$->update.relation_name = $2;
-      $$->update.attribute_name = $4;
-      $$->update.value = *$6;
-      if ($7 != nullptr) {
-        $$->update.conditions.swap(*$7);
-        delete $7;
+      if($5)
+      {
+        for (auto& UpdatePair: *$5)
+        {
+          $$->update.attribute_names.push_back(UpdatePair.attribute_name);
+          $$->update.values.push_back(*UpdatePair.value);
+        }
+      }
+      $$->update.attribute_names.push_back($4->attribute_name);
+      $$->update.values.push_back(*$4->value);
+      if ($6 != nullptr) {
+        $$->update.conditions.swap(*$6);
+        delete $6;
       }
       free($2);
-      free($4);
     }
     ;
 select_stmt:        /*  select 语句的语法解析树*/
@@ -454,56 +466,44 @@ select_stmt:        /*  select 语句的语法解析树*/
       }
       free($4);
     }
-| SELECT select_attr FROM ID inner_join inner_join_list where
+    | SELECT select_attr FROM ID inner_join inner_join_list where
     {
       $$ = new ParsedSqlNode(SCF_SELECT);
 
-      // 设置选择的属性
       if ($2 != nullptr) {
         $$->selection.attributes.swap(*$2);
         delete $2;
       }
-      
-      // 设置主表名
       std::string main_table_name = $4;
-      $$->selection.relations.push_back(main_table_name); // 主表加入relations列表
-
-      // 处理inner_join部分
+      $$->selection.relations.push_back(main_table_name);
       if ($5 != nullptr) {
-        // 遍历$5返回的JoinSqlNode列表，添加它们的relation_name到relations
         for (auto &join_relation : *$5) {
           $$->selection.relations.push_back(join_relation.relation_name);
-          // 同时，把这个JOIN操作的条件加入到conditions
           for (auto &condition : join_relation.conditions) {
             $$->selection.conditions.push_back(condition);
           }
         }
-        delete $5; // 释放$5占用的资源
+        delete $5;
       }
 
-      // 处理inner_join_list部分
       if ($6 != nullptr && !$6->empty()) {
-        // 遍历$6返回的JoinSqlNode列表，添加它们的relation_name到relations
         for (auto &join_relation : *$6) {
           $$->selection.relations.push_back(join_relation.relation_name);
-          // 同时，把这些JOIN操作的条件加入到conditions
           for (auto &condition : join_relation.conditions) {
             $$->selection.conditions.push_back(condition);
           }
         }
-        delete $6; // 释放$6占用的资源
+        delete $6;
       }
 
-      // 处理WHERE子句
       if ($7 != nullptr) {
-        // 把WHERE子句的条件加入到conditions
         for (auto &condition : *$7) {
           $$->selection.conditions.push_back(condition);
         }
-        delete $7; // 释放$7占用的资源
+        delete $7;
       }
 
-      free($4); // 释放主表名占用的字符串资源
+      free($4);
     }
     ;
 
@@ -603,6 +603,26 @@ select_attr:
       }
     }
     ;
+
+update_attr:
+    ID EQ value {
+      $$ = new UpdateList();
+      $$->attribute_name = $1;
+      $$->value = $3;
+      free($1);
+    }
+    ;
+
+update_attr_list:
+    /* empty */
+    {
+      $$ = nullptr;
+    }
+    | COMMA update_attr update_attr_list {
+      if (!$3) $$ = $3;
+      else     $$ = new std::vector<UpdateList>;
+      $$->push_back(*$2);
+    }
 
 rel_attr:
     '*' {

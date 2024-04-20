@@ -114,13 +114,15 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 111 "yacc_sql.y"
+#line 112 "yacc_sql.y"
 
   ParsedSqlNode *                   sql_node;
   ConditionSqlNode *                condition;
   Value *                           value;
   enum CompOp                       comp;
   RelAttrSqlNode *                  rel_attr;
+  UpdateList *                      update_attr;
+  std::vector<UpdateList> *         update_attr_list;
   std::vector<AttrInfoSqlNode> *    attr_infos;
   AttrInfoSqlNode *                 attr_info;
   Expression *                      expression;
@@ -134,7 +136,7 @@ union YYSTYPE
   int                               number;
   float                             floats;
 
-#line 138 "yacc_sql.hpp"
+#line 140 "yacc_sql.hpp"
 
 };
 typedef union YYSTYPE YYSTYPE;

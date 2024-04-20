@@ -31,7 +31,7 @@ UpdateStmt::UpdateStmt(
 
 RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt)
 {
-    if (!db || update.relation_name.empty() || update.attribute_name.empty())
+    if (!db || update.relation_name.empty() || update.attribute_names[0].empty())
     {
         LOG_WARN("Invalid argument. db=%p, table_name=%s", db, update.relation_name.c_str());
         return RC::INVALID_ARGUMENT;
@@ -59,7 +59,7 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt)
     for (int i = 0; i < table_meta.field_num(); ++i)
     {
         const FieldMeta* current = table_meta.field(i);
-        if (current->name() == update.attribute_name)
+        if (current->name() == update.attribute_names[0])
         {
             field_meta = current;
             break;
@@ -68,17 +68,17 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update, Stmt*& stmt)
 
     if (!field_meta)
     {
-        LOG_WARN("Field '%s' not found in table '%s'.", update.attribute_name.c_str(), update.relation_name.c_str());
+        LOG_WARN("Field '%s' not found in table '%s'.", update.attribute_names[0].c_str(), update.relation_name.c_str());
         return RC::SCHEMA_FIELD_MISSING;
     }
 
-    if (field_meta->type() != update.value.attr_type())
+    if (field_meta->type() != update.values[0].attr_type())
     {
         LOG_WARN("Type mismatch. Cannot update a %s field with a %s value.", 
-                 attr_type_to_string(field_meta->type()), attr_type_to_string(update.value.attr_type()));
+                 attr_type_to_string(field_meta->type()), attr_type_to_string(update.values[0].attr_type()));
         return RC::INVALID_ARGUMENT;
     }
 
-    stmt = new UpdateStmt(table, const_cast<Value*>(&update.value), 1, filter_stmt, update.attribute_name);
+    stmt = new UpdateStmt(table, const_cast<Value*>(&update.values[0]), 1, filter_stmt, update.attribute_names[0]);
     return RC::SUCCESS;
 }
