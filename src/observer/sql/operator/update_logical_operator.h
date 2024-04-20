@@ -21,5 +21,5 @@ class UpdateLogicalOperator : public LogicalOperator
   private:
     Table* table_ = nullptr;
     Value  value_;
-    char*  field_name_ = nullptr;
+    const char*  field_name_ = nullptr;
 };
