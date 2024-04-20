@@ -623,6 +623,7 @@ update_attr_list:
       else    $$ = new std::vector<UpdateList>;
       $$->push_back(*$2);
     }
+    ;
 
 rel_attr:
     '*' {
