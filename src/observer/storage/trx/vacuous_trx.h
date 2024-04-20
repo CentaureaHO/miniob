@@ -44,7 +44,7 @@ class VacuousTrx : public Trx
     RC insert_record(Table* table, Record& record) override;
     RC delete_record(Table* table, Record& record) override;
     RC visit_record(Table* table, Record& record, bool readonly) override;
-    RC update_record(Table* table, Record& record, Value& value, int offset) override;
+    RC update_record(Table* table, Record& record, Value& value, int offset, int len) override;
     RC start_if_need() override;
     RC commit() override;
     RC rollback() override;

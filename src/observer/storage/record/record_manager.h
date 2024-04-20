@@ -198,7 +198,7 @@ class RecordPageHandler
      * @note
      * 该函数将直接修改记录中指定偏移量位置开始的数据。调用者需要确保提供的偏移量和value在记录中是有效的，以避免数据损坏。
      */
-    RC update_record(int offset, Value& value, RID* rid);
+    RC update_record(int offset, Value& value, RID* rid, int len);
 
     /**
      * @brief 返回该记录页的页号
@@ -319,7 +319,7 @@ class RecordFileHandler
      *       操作将失败并返回相应的错误码。成功执行更新操作后，所在页面将被标记为脏页，意味着页面的内容已被修改并需要在合适的时机回写到磁盘。
      *       更新操作需要确保rid指向的记录有效且存在。调用者需要确保提供的offset和value大小在记录的有效范围内，以避免数据损坏。
      */
-    RC update_record(int offset, Value& value, RID* rid);
+    RC update_record(int offset, Value& value, RID* rid, int len);
 
     /**
      * @brief 与get_record类似，访问某个记录，并提供回调函数来操作相应的记录

@@ -71,6 +71,7 @@ class Value
 
     const char* data() const;
     int         length() const { return length_; }
+    bool        IsStrItem() const { return attr_type_ == CHARS; }
 
     AttrType attr_type() const { return attr_type_; }
 

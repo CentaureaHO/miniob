@@ -31,7 +31,6 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update_sql, Stmt*& stmt)
 
     for (size_t i = 0; i < attribute_names.size(); ++i)
     {
-        std::cout << attribute_names[i] << std::endl;
         const FieldMeta* field_meta = table->table_meta().field(attribute_names[i].c_str());
         if (!field_meta)
         {
@@ -49,13 +48,13 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update_sql, Stmt*& stmt)
     std::unordered_map<std::string, Table*> table_map;
     table_map[table->name()] = table;
 
-    FilterStmt* filter_stmt = nullptr;  // 先声明一个 nullptr 的 FilterStmt 指针
+    FilterStmt* filter_stmt = nullptr;
     RC          rc          = FilterStmt::create(db,
         table,
         &table_map,
         update_sql.conditions.data(),
         update_sql.conditions.size(),
-        filter_stmt);  // 直接传递 filter_stmt
+        filter_stmt);
     if (rc != RC::SUCCESS)
     {
         LOG_WARN("Failed to create filter statement. rc=%d:%s", rc, strrc(rc));

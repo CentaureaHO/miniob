@@ -191,7 +191,7 @@ RC MvccTrx::delete_record(Table* table, Record& record)
     return RC::SUCCESS;
 }
 
-RC MvccTrx::update_record(Table* table, Record& record, Value& value, int offset)
+RC MvccTrx::update_record(Table* table, Record& record, Value& value, int offset, int len)
 {
     Field BeginField, EndField;
     trx_fields(table, BeginField, EndField);
@@ -203,7 +203,7 @@ RC MvccTrx::update_record(Table* table, Record& record, Value& value, int offset
         trx_id_,
         record.rid().to_string().c_str());
 
-    RC rc = table->update_record(record, value, offset);
+    RC rc = table->update_record(record, value, offset, len);
     ASSERT(rc == RC::SUCCESS, "Failed to update. rc=%s", strrc(rc));
 
     EndField.set_int(record, -trx_id_);

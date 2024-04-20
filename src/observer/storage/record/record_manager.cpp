@@ -286,7 +286,7 @@ RC RecordPageHandler::get_record(const RID* rid, Record* rec)
     return RC::SUCCESS;
 }
 
-RC RecordPageHandler::update_record(int Offset, Value& value, RID* rid)
+RC RecordPageHandler::update_record(int Offset, Value& value, RID* rid, int len)
 {
     ASSERT(!readonly_, "Cannot update record from page while the page is readonly.");
     if (rid->slot_num >= page_header_->record_capacity)
@@ -304,8 +304,8 @@ RC RecordPageHandler::update_record(int Offset, Value& value, RID* rid)
 
     char* ChangeLoc =
         frame_->data() + page_header_->first_record_offset + page_header_->record_size * rid->slot_num + Offset;
-    memcpy(ChangeLoc, value.data(), value.length());
 
+    memcpy(ChangeLoc, value.data(), ((len + 1) ? len: value.length()));
     frame_->mark_dirty();
     return RC::SUCCESS;
 }
@@ -511,7 +511,7 @@ RC RecordFileHandler::get_record(RecordPageHandler& page_handler, const RID* rid
     return page_handler.get_record(rid, rec);
 }
 
-RC RecordFileHandler::update_record(int offset, Value& value, RID* rid)
+RC RecordFileHandler::update_record(int offset, Value& value, RID* rid, int len)
 {
     RecordPageHandler page_handler;
     RC                rc = page_handler.init(*disk_buffer_pool_, rid->page_num, false);
@@ -521,7 +521,7 @@ RC RecordFileHandler::update_record(int offset, Value& value, RID* rid)
         return rc;
     }
 
-    return page_handler.update_record(offset, value, rid);
+    return page_handler.update_record(offset, value, rid, len);
 }
 
 RC RecordFileHandler::visit_record(const RID& rid, bool readonly, std::function<void(Record&)> visitor)

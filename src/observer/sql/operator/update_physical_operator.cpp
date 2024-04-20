@@ -8,9 +8,7 @@ using namespace std;
 UpdatePhysicalOperator::UpdatePhysicalOperator(
     Table* table, const std::vector<Value>& values, const std::vector<std::string>& field_names)
     : table_(table), values_(values), field_names_(field_names)
-{
-    
-}
+{}
 
 UpdatePhysicalOperator::~UpdatePhysicalOperator() {}
 
@@ -51,7 +49,7 @@ RC UpdatePhysicalOperator::next()
             const FieldMeta* fieldmeta = table_->table_meta().field(field_names_[i].c_str());
             if (!fieldmeta) return RC::SCHEMA_FIELD_MISSING;
 
-            rc = trx_->update_record(table_, record, values_[i], fieldmeta->offset());
+            rc = trx_->update_record(table_, record, values_[i], fieldmeta->offset(), fieldmeta->len());
             if (rc != RC::SUCCESS)
             {
                 LOG_WARN("Failed to update record: %s.", strrc(rc));

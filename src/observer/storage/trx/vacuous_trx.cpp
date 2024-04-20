@@ -38,9 +38,9 @@ RC VacuousTrx::delete_record(Table* table, Record& record) { return table->delet
 
 RC VacuousTrx::visit_record(Table* table, Record& record, bool readonly) { return RC::SUCCESS; }
 
-RC VacuousTrx::update_record(Table* table, Record& record, Value& value, int offset)
+RC VacuousTrx::update_record(Table* table, Record& record, Value& value, int offset, int len)
 {
-    return table->update_record(record, value, offset);
+    return table->update_record(record, value, offset, len);
 }
 
 RC VacuousTrx::start_if_need() { return RC::SUCCESS; }
