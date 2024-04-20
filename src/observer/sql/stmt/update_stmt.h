@@ -33,30 +33,20 @@ class UpdateStmt : public Stmt
   public:
     UpdateStmt() = default;
     UpdateStmt(
-        Table* table, Value* values, int value_amount, FilterStmt* filter_stmt, const std::string& attribute_name);
+        Table* table, std::vector<Value> values, FilterStmt* filter_stmt, std::vector<std::string> attribute_names);
+
     StmtType type() const override { return StmtType::UPDATE; }
 
-  public:
     static RC create(Db* db, const UpdateSqlNode& update_sql, Stmt*& stmt);
 
-  public:
-    Table*      table() const { return table_; }
-    Value*      values() const { return values_; }
-    int         value_amount() const { return value_amount_; }
-    FilterStmt* filter_stmt() const { return filter_stmt_; }
-    std::string attribute_name() const { return attribute_name_; }
+    Table*                          table() const { return table_; }
+    const std::vector<Value>&       values() const { return values_; }
+    FilterStmt*                     filter_stmt() const { return filter_stmt_; }
+    const std::vector<std::string>& attribute_names() const { return attribute_names_; }
 
   private:
-    /*
-     * table_: 表对象指针
-     * values_: 待更新的值
-     * value_amount_: 待更新的值的数量
-     * filter_stmt_: 过滤语句指针
-     * attribute_name_: 待更新的属性名
-     */
-    Table*      table_        = nullptr;
-    Value*      values_       = nullptr;
-    int         value_amount_ = 0;
-    FilterStmt* filter_stmt_  = nullptr;
-    std::string attribute_name_;
+    Table*                   table_ = nullptr;
+    std::vector<Value>       values_;
+    FilterStmt*              filter_stmt_ = nullptr;
+    std::vector<std::string> attribute_names_;
 };

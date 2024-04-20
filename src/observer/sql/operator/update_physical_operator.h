@@ -12,8 +12,8 @@ class DeleteStmt;
 class UpdatePhysicalOperator : public PhysicalOperator
 {
   public:
-    UpdatePhysicalOperator(Table* table, Value& value, const char* field_name);
-    ~UpdatePhysicalOperator();
+    UpdatePhysicalOperator(Table* table, const std::vector<Value>& values, const std::vector<std::string>& field_names);
+    virtual ~UpdatePhysicalOperator();
 
     PhysicalOperatorType type() const override;
 
@@ -24,8 +24,8 @@ class UpdatePhysicalOperator : public PhysicalOperator
     Tuple* current_tuple() override { return nullptr; }
 
   private:
-    Table* table_ = nullptr;
-    Value  value_;
-    char*  field_name_ = nullptr;
-    Trx*   trx_        = nullptr;
+    Table*                   table_ = nullptr;
+    std::vector<Value>       values_;
+    std::vector<std::string> field_names_;
+    Trx*                     trx_ = nullptr;
 };

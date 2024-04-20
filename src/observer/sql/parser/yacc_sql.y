@@ -619,8 +619,8 @@ update_attr_list:
       $$ = nullptr;
     }
     | COMMA update_attr update_attr_list {
-      if (!$3) $$ = $3;
-      else     $$ = new std::vector<UpdateList>;
+      if ($3) $$ = $3;
+      else    $$ = new std::vector<UpdateList>;
       $$->push_back(*$2);
     }
 

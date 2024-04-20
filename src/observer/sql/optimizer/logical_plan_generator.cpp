@@ -246,14 +246,23 @@ RC LogicalPlanGenerator::create_plan(ExplainStmt* explain_stmt, unique_ptr<Logic
 
 RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<LogicalOperator>& logical_operator)
 {
-    Table*             table      = update_stmt->table();
-    const TableMeta&   table_meta = table->table_meta();
+    Table*                          table           = update_stmt->table();
+    const std::vector<std::string>& attribute_names = update_stmt->attribute_names();
+    const std::vector<Value>&       values          = update_stmt->values();
+
     std::vector<Field> fields;
-    for (int i = 0; i < table_meta.field_num(); ++i)
+    const TableMeta&   table_meta = table->table_meta();
+    for (const auto& attr_name : attribute_names)
     {
-        const FieldMeta* field_meta = table_meta.field(i);
+        const FieldMeta* field_meta = table_meta.field(attr_name.c_str());
+        if (!field_meta)
+        {
+            LOG_WARN("Field '%s' not found in table '%s'.", attr_name.c_str(), table->name());
+            return RC::SCHEMA_FIELD_MISSING;
+        }
         fields.emplace_back(table, field_meta);
     }
+
     auto table_get_oper = std::make_unique<TableGetLogicalOperator>(table, fields, 0);
 
     unique_ptr<LogicalOperator> filter_oper;
@@ -262,16 +271,15 @@ RC LogicalPlanGenerator::create_plan(UpdateStmt* update_stmt, unique_ptr<Logical
         RC rc = create_plan(update_stmt->filter_stmt(), filter_oper);
         if (rc != RC::SUCCESS) return rc;
     }
-    auto update_oper =
-        std::make_unique<UpdateLogicalOperator>(table, *update_stmt->values(), update_stmt->attribute_name().c_str());
+
+    auto update_oper = std::make_unique<UpdateLogicalOperator>(table, values, attribute_names);
 
     if (filter_oper)
     {
         filter_oper->add_child(std::move(table_get_oper));
         update_oper->add_child(std::move(filter_oper));
     }
-    else
-        update_oper->add_child(std::move(table_get_oper));
+    else { update_oper->add_child(std::move(table_get_oper)); }
 
     logical_operator = std::move(update_oper);
     return RC::SUCCESS;

@@ -5,14 +5,14 @@
 
 using namespace std;
 
-UpdatePhysicalOperator::UpdatePhysicalOperator(Table* table, Value& value, const char* field_name)
-    : table_(table), value_(value)
+UpdatePhysicalOperator::UpdatePhysicalOperator(
+    Table* table, const std::vector<Value>& values, const std::vector<std::string>& field_names)
+    : table_(table), values_(values), field_names_(field_names)
 {
-    field_name_ = new char[strlen(field_name) + 1];
-    strcpy(field_name_, field_name);
+    
 }
 
-UpdatePhysicalOperator::~UpdatePhysicalOperator() { delete[] field_name_; }
+UpdatePhysicalOperator::~UpdatePhysicalOperator() {}
 
 PhysicalOperatorType UpdatePhysicalOperator::type() const { return PhysicalOperatorType::UPDATE; }
 
@@ -33,10 +33,11 @@ RC UpdatePhysicalOperator::open(Trx* trx)
 
 RC UpdatePhysicalOperator::next()
 {
-    RC rc = RC::SUCCESS;
     if (children_.empty()) return RC::RECORD_EOF;
 
     PhysicalOperator* child = children_[0].get();
+    RC                rc    = RC::SUCCESS;
+
     while (RC::SUCCESS == (rc = child->next()))
     {
         Tuple* tuple = child->current_tuple();
@@ -44,16 +45,18 @@ RC UpdatePhysicalOperator::next()
 
         RowTuple* row_tuple = static_cast<RowTuple*>(tuple);
         Record&   record    = row_tuple->record();
-        if (!(*field_name_)) return RC::EMPTY;
 
-        const FieldMeta* fieldmeta = table_->table_meta().field(field_name_);
-        if (!fieldmeta) return RC::EMPTY;
-
-        rc = trx_->update_record(table_, record, value_, fieldmeta->offset());
-        if (rc != RC::SUCCESS)
+        for (size_t i = 0; i < field_names_.size(); ++i)
         {
-            LOG_WARN("Failed to delete record in case: %s.", strrc(rc));
-            return rc;
+            const FieldMeta* fieldmeta = table_->table_meta().field(field_names_[i].c_str());
+            if (!fieldmeta) return RC::SCHEMA_FIELD_MISSING;
+
+            rc = trx_->update_record(table_, record, values_[i], fieldmeta->offset());
+            if (rc != RC::SUCCESS)
+            {
+                LOG_WARN("Failed to update record: %s.", strrc(rc));
+                return rc;
+            }
         }
     }
     return RC::RECORD_EOF;

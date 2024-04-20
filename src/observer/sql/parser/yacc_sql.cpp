@@ -2294,8 +2294,8 @@ yyreduce:
   case 71: /* update_attr_list: COMMA update_attr update_attr_list  */
 #line 621 "yacc_sql.y"
                                          {
-      if (!(yyvsp[0].update_attr_list)) (yyval.update_attr_list) = (yyvsp[0].update_attr_list);
-      else     (yyval.update_attr_list) = new std::vector<UpdateList>;
+      if ((yyvsp[0].update_attr_list)) (yyval.update_attr_list) = (yyvsp[0].update_attr_list);
+      else    (yyval.update_attr_list) = new std::vector<UpdateList>;
       (yyval.update_attr_list)->push_back(*(yyvsp[-1].update_attr));
     }
 #line 2302 "yacc_sql.cpp"
