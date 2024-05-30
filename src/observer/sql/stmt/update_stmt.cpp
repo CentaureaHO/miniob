@@ -18,17 +18,14 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update_sql, Stmt*& stmt)
         LOG_WARN("Invalid argument. db=%p, table_name=%s", db, update_sql.relation_name.c_str());
         return RC::INVALID_ARGUMENT;
     }
-
     Table* table = db->find_table(update_sql.relation_name.c_str());
     if (!table)
     {
         LOG_WARN("No such table. db=%s, table_name=%s", db->name(), update_sql.relation_name.c_str());
         return RC::SCHEMA_TABLE_NOT_EXIST;
     }
-
     std::vector<std::string> attribute_names = update_sql.attribute_names;
     std::vector<Value>       values          = update_sql.values;
-
     for (size_t i = 0; i < attribute_names.size(); ++i)
     {
         const FieldMeta* field_meta = table->table_meta().field(attribute_names[i].c_str());
@@ -44,23 +41,16 @@ RC UpdateStmt::create(Db* db, const UpdateSqlNode& update_sql, Stmt*& stmt)
             return RC::INVALID_ARGUMENT;
         }
     }
-
     std::unordered_map<std::string, Table*> table_map;
     table_map[table->name()] = table;
-
-    FilterStmt* filter_stmt = nullptr;
-    RC          rc          = FilterStmt::create(db,
-        table,
-        &table_map,
-        update_sql.conditions.data(),
-        update_sql.conditions.size(),
-        filter_stmt);
+    FilterStmt* filter_stmt  = nullptr;
+    RC          rc           = FilterStmt::create(
+        db, table, &table_map, update_sql.conditions.data(), update_sql.conditions.size(), filter_stmt);
     if (rc != RC::SUCCESS)
     {
         LOG_WARN("Failed to create filter statement. rc=%d:%s", rc, strrc(rc));
         return rc;
     }
-
     stmt = new UpdateStmt(table, std::move(values), filter_stmt, std::move(attribute_names));
     return RC::SUCCESS;
 }
