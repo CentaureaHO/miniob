@@ -74,7 +74,7 @@ namespace common
         return (cmp > EPSILON) - (cmp < -EPSILON);
     }
 
-    int compare_str2int(void* arg1, void* arg2) { return -compare_int2str(arg1, arg2); }
+    int compare_str2int(void* arg1, void* arg2) { return -compare_int2str(arg2, arg1); }
 
-    int compare_str2float(void* arg1, void* arg2) { return -compare_float2str(arg1, arg2); }
+    int compare_str2float(void* arg1, void* arg2) { return -compare_float2str(arg2, arg1); }
 }  // namespace common
