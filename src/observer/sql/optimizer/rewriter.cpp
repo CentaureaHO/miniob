@@ -58,5 +58,6 @@ RC Rewriter::rewrite(std::unique_ptr<LogicalOperator>& oper, bool& change_made)
 
         if (sub_change_made && !change_made) { change_made = true; }
     }
+
     return rc;
 }

@@ -28,6 +28,36 @@ See the Mulan PSL v2 for more details. */
 #include "event/sql_event.h"
 #include "event/session_event.h"
 
+#include <iostream>
+
+const char* LogicalType2Str(LogicalOperatorType type)
+{
+    switch (type)
+    {
+        case LogicalOperatorType::CALC: return "CALC";
+        case LogicalOperatorType::TABLE_GET: return "TABLE_GET";
+        case LogicalOperatorType::PREDICATE: return "PREDICATE";
+        case LogicalOperatorType::PROJECTION: return "PROJECTION";
+        case LogicalOperatorType::JOIN: return "JOIN";
+        case LogicalOperatorType::INSERT: return "INSERT";
+        case LogicalOperatorType::DELETE: return "DELETE";
+        case LogicalOperatorType::EXPLAIN: return "EXPLAIN";
+        case LogicalOperatorType::UPDATE: return "UPDATE";
+        case LogicalOperatorType::AGGREGATE: return "AGGREGATE";
+        default: return "UNKNOWN";
+    }
+}
+
+void PrintPlanTree(LogicalOperator* Oper, int Depth = 0)
+{
+    if (!Oper) return;
+
+    for (int i = 0; i < Depth; ++i) { std::cout << "  "; }
+    std::cout << LogicalType2Str(Oper->type()) << std::endl;
+
+    for (const auto& child : Oper->children()) { PrintPlanTree(child.get(), Depth + 1); }
+}
+
 using namespace std;
 using namespace common;
 
@@ -87,7 +117,9 @@ RC OptimizeStage::generate_physical_plan(
 RC OptimizeStage::rewrite(unique_ptr<LogicalOperator>& logical_operator)
 {
     RC rc = RC::SUCCESS;
-
+    std::cout << "Plan tree before rewrite:" << std::endl;
+    PrintPlanTree(logical_operator.get());
+    std::cout << std::endl;
     bool change_made = false;
     do {
         change_made = false;
@@ -98,6 +130,10 @@ RC OptimizeStage::rewrite(unique_ptr<LogicalOperator>& logical_operator)
             return rc;
         }
     } while (change_made);
+
+    std::cout << "Plan tree after rewrite:" << std::endl;
+    PrintPlanTree(logical_operator.get());
+    std::cout << std::endl;
 
     return rc;
 }

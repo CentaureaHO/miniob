@@ -109,12 +109,8 @@ struct SelectSqlNode
  */
 struct JoinSqlNode
 {
-    std::string                   relation_name;  ///< Relation to join
-    std::vector<ConditionSqlNode> conditions;     ///< Join conditions
-
-    JoinSqlNode(const char* rel_name, const std::vector<ConditionSqlNode>& conds)
-        : relation_name(rel_name), conditions(conds)
-    {}
+    std::vector<std::string>      relations;
+    std::vector<ConditionSqlNode> conditions;
 };
 
 struct RelationSqlNode

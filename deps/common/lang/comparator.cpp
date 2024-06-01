@@ -28,8 +28,8 @@ namespace common
 
     int compare_float(void* arg1, void* arg2)
     {
-        float v1 = *(float*)arg1;
-        float v2 = *(float*)arg2;
+        float v1  = *(float*)arg1;
+        float v2  = *(float*)arg2;
         float cmp = v1 - v2;
         if (cmp > EPSILON) { return 1; }
         if (cmp < -EPSILON) { return -1; }
@@ -38,8 +38,8 @@ namespace common
 
     int compare_string(void* arg1, int arg1_max_length, void* arg2, int arg2_max_length)
     {
-        const char* s1 = (const char*)arg1;
-        const char* s2 = (const char*)arg2;
+        const char* s1     = (const char*)arg1;
+        const char* s2     = (const char*)arg2;
         int         maxlen = std::min(arg1_max_length, arg2_max_length);
         int         result = strncmp(s1, s2, maxlen);
         if (0 != result) { return result; }
@@ -57,4 +57,24 @@ namespace common
         return v1 - v2;
     }
 
+    int compare_int2str(void* arg1, void* arg2)
+    {
+        int v1 = *(int*)arg1;
+        int v2 = atoi((const char*)arg2);
+
+        return (v1 > v2) - (v1 < v2);
+    }
+
+    int compare_float2str(void* arg1, void* arg2)
+    {
+        float v1  = *(float*)arg1;
+        float v2  = atof((const char*)arg2);
+        float cmp = v1 - v2;
+
+        return (cmp > EPSILON) - (cmp < -EPSILON);
+    }
+
+    int compare_str2int(void* arg1, void* arg2) { return -compare_int2str(arg1, arg2); }
+
+    int compare_str2float(void* arg1, void* arg2) { return -compare_float2str(arg1, arg2); }
 }  // namespace common

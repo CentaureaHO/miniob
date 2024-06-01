@@ -127,7 +127,7 @@ union YYSTYPE
   AttrInfoSqlNode *                 attr_info;
   Expression *                      expression;
   std::vector<Expression *> *       expression_list;
-  std::vector<JoinSqlNode> *        join_list;
+  JoinSqlNode *                     join_type;
   std::vector<Value> *              value_list;
   std::vector<ConditionSqlNode> *   condition_list;
   std::vector<RelAttrSqlNode> *     rel_attr_list;
